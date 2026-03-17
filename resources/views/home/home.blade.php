@@ -1,0 +1,5 @@
+@include('home.sections.hero')
+@include('home.sections.stats')
+@include('home.sections.services')
+@include('home.sections.about')
+@include('home.sections.cta')

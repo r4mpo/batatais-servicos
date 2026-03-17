@@ -1,0 +1,434 @@
+/* 1. CONFIGURAÇÕES GERAIS E VARIÁVEIS */
+:root {
+    --primary-color: #e60000;
+    --secondary-color: #003399;
+    --gradient-primary: linear-gradient(135deg, #e60000 0%, #b30000 100%);
+    --gradient-secondary: linear-gradient(135deg, #003399 0%, #002266 100%);
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+}
+
+/* 2. LAYOUT PRINCIPAL (AUTH) */
+.auth-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.auth-left {
+    flex: 1;
+    background: var(--gradient-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-left::before, .auth-left::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+}
+
+.auth-left::before {
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: rgba(0, 51, 153, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+.auth-left::after {
+    bottom: -30%;
+    left: -5%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+.auth-left-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+    animation: slideInLeft 0.8s ease;
+}
+
+.auth-left-content img {
+    height: 100px;
+    margin-bottom: 30px;
+    animation: scaleIn 0.6s ease;
+}
+
+.auth-left-content h2 {
+    font-family: "Poppins", sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.auth-left-content p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.auth-right {
+    flex: 1;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow-y: auto;
+}
+
+/* Scrollbar Customizado */
+.auth-right::-webkit-scrollbar { width: 6px; }
+.auth-right::-webkit-scrollbar-track { background: #f1f1f1; }
+.auth-right::-webkit-scrollbar-thumb { background: #e60000; border-radius: 3px; }
+
+/* 3. COMPONENTES DE FORMULÁRIO */
+.auth-form-wrapper {
+    width: 100%;
+    max-width: 380px;
+    animation: slideInRight 0.8s ease;
+}
+
+.auth-form-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.auth-form-header h3 {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #e60000;
+    margin-bottom: 5px;
+}
+
+.auth-form-header p {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.form-group-custom {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label-custom {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    color: #e60000;
+    margin-bottom: 6px;
+    display: block;
+    font-size: 0.85rem;
+}
+
+.form-control-custom {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    background: white;
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    box-sizing: border-box;
+}
+
+.form-control-custom:focus {
+    border-color: #e60000;
+    box-shadow: 0 0 0 0.15rem rgba(230, 0, 0, 0.1);
+    outline: none;
+}
+
+/* 4. SELETORES E BOTÕES */
+.profile-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.radio-options {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.radio-option { flex: 1; position: relative; }
+.radio-option input[type="radio"] { display: none; }
+
+.radio-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    color: #666;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Poppins", sans-serif;
+}
+
+.radio-option input[type="radio"]:checked + label {
+    color: #e60000;
+    border-color: #e60000;
+    box-shadow: 0 2px 8px rgba(230, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(230, 0, 0, 0.3);
+    cursor: pointer;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.btn-primary:hoverr {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(230, 0, 0, 0.4);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover { color: #e60000; }
+
+.input-group-custom {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.btn-primary:disabled,
+.btn-primary[disabled] {
+    background: linear-gradient(135deg, #bfbfbf 0%, #9e9e9e 100%);
+    color: #f5f5f5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 0.7;
+}
+
+/* garante que não tenha animação quando estiver disabled */
+.btn-primary:disabled:hover,
+.btn-primary[disabled]:hover {
+    transform: none;
+    box-shadow: none;
+}
+/* 5. ELEMENTOS DE APOIO */
+.auth-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f5f7fa;
+    border: 1px solid #e3e6ea;
+    border-left: 4px solid var(--secondary-color);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #444;
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInUp 0.6s ease;
+    font-size: 0.9rem;
+}
+
+.divider-custom {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    color: #ccc;
+    font-size: 0.8rem;
+}
+
+.divider-custom::before, .divider-custom::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e9ecef;
+}
+
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+/* 6. ANIMAÇÕES */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(20px); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 7. MEDIA QUERIES */
+@media (max-width: 992px) {
+    .auth-container { flex-direction: column; height: auto; }
+    .auth-left { min-height: 250px; padding: 30px 20px; }
+    .auth-right { min-height: auto; padding: 30px 20px; }
+    .auth-left-content h2 { font-size: 1.5rem; }
+    .auth-features { display: none; }
+}
+
+/* 8. LINKS E CHECKBOX (RESTAURAÇÃO) */
+
+/* Checkbox e Labels de Termos */
+.form-check-custom {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 15px 0;
+    font-size: 0.8rem;
+}
+
+.form-check-custom input {
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    accent-color: #e60000;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.form-check-custom label {
+    cursor: pointer;
+    margin: 0;
+    color: #666;
+    line-height: 1.4;
+}
+
+.form-check-custom a {
+    color: #e60000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-check-custom a:hover {
+    text-decoration: underline;
+}
+
+/* Links de Alternância (Cadastre-se / Já tenho conta) */
+.signup-link, .login-link {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 0.85rem;
+}
+
+.signup-link a, .login-link a {
+    color: #e60000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link a:hover, .login-link a:hover {
+    color: #003399;
+    text-decoration: underline;
+}
+
+/* Botão Secundário (Links que parecem botões) */
+.btn-secondary-link {
+    background: #f8f9fa;
+    color: #e60000;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 9px;
+    font-weight: 600;
+    width: 100%;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.btn-secondary-link:hover {
+    background: #e60000;
+    color: white;
+    border-color: #e60000;
+    transform: translateY(-2px);
+}
