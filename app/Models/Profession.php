@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Profession extends Model
@@ -31,5 +32,10 @@ class Profession extends Model
     public function practiceArea(): BelongsTo
     {
         return $this->belongsTo(PracticeArea::class);
+    }
+
+    public function professionals(): HasMany
+    {
+        return $this->hasMany(Professional::class);
     }
 }

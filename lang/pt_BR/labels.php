@@ -321,6 +321,47 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     /*
     |--------------------------------------------------------------------------
+    | Listagem de profissionais
+    |--------------------------------------------------------------------------
+    */
+
+    'professionals_page_title' => 'Profissionais',
+    'professionals_filters_heading' => 'Filtros',
+    'professionals_search_label' => 'Busca',
+    'professionals_search_placeholder' => 'Buscar profissional...',
+    'professionals_sort_heading' => 'Ordenar por',
+    'professionals_sort_relevance' => 'Mais relevante',
+    'professionals_sort_rating' => 'Melhor avaliado',
+    'professionals_sort_price_asc' => 'Menor preço (hora)',
+    'professionals_sort_price_desc' => 'Maior preço (hora)',
+    'professionals_sort_recent' => 'Mais recente',
+    'professionals_category_heading' => 'Categoria',
+    'professionals_category_select_placeholder' => 'Pesquisar e selecionar categorias…',
+    'professionals_category_select_hint' => 'Use a caixa acima para filtrar a lista e selecionar uma ou mais categorias.',
+    'professionals_rating_heading' => 'Avaliação',
+    'professionals_rating_5' => '5 estrelas',
+    'professionals_rating_4_plus' => '4+ estrelas',
+    'professionals_price_heading' => 'Faixa de preço (por hora)',
+    'professionals_price_up_to' => 'Até',
+    'professionals_availability_heading' => 'Disponibilidade',
+    'professionals_avail_today' => 'Disponível hoje',
+    'professionals_avail_week' => 'Disponível nesta semana',
+    'professionals_avail_24h' => 'Disponível 24h',
+    'professionals_apply_filters' => 'Aplicar filtros',
+    'professionals_clear_filters' => 'Limpar filtros',
+    'professionals_showing' => 'Mostrando',
+    'professionals_total_label' => 'profissionais',
+    'professionals_empty' => 'Nenhum profissional encontrado com os filtros selecionados.',
+    'professionals_reviews' => ':count avaliações',
+    'professionals_per_hour' => 'hora',
+    'professionals_view_profile' => 'Ver perfil',
+    'professionals_contact' => 'Contato',
+    'professionals_pagination_label' => 'Paginação da listagem',
+    'professionals_rating_stars_label' => 'Nota :n de 5',
+    'nav_professionals' => 'Profissionais',
+
+    /*
+    |--------------------------------------------------------------------------
     | Estatísticas da landing
     |--------------------------------------------------------------------------
     */

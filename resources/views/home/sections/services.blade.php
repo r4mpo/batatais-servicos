@@ -13,11 +13,11 @@
                             <h5 class="card-title">{{ $profession->title }}</h5>
                             <p class="card-text">{{ $profession->description }}</p>
                             @if ($profession->is_global_listing)
-                                <a href="{{ url('profissionais') }}" class="btn btn-primary btn-sm">
+                                <a href="{{ route('professionals.index') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-arrow-right me-1"></i>{{ __('labels.professional_categories_view_all') }}
                                 </a>
                             @else
-                                <a href="{{ url('profissionais?categoria=' . $profession->slug) }}"
+                                <a href="{{ route('professionals.index', ['categoria' => $profession->slug]) }}"
                                     class="btn btn-primary btn-sm">
                                     <i class="fas fa-arrow-right me-1"></i>{{ __('labels.professional_categories_view_professionals') }}
                                 </a>

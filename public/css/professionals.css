@@ -1,0 +1,156 @@
+/* Listagem de profissionais (/profissionais) */
+
+.professional-card {
+    position: relative;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    overflow: hidden;
+}
+
+.professional-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.professional-image {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #002673 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.professional-body {
+    padding: 20px;
+}
+
+.professional-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: var(--text-dark);
+}
+
+.professional-category {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.professional-rating {
+    margin-bottom: 10px;
+}
+
+.professional-rating .stars {
+    color: #ffc107;
+    font-size: 0.9rem;
+}
+
+.professional-rating .reviews {
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.professional-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1b7f5a;
+    margin-bottom: 10px;
+}
+
+.filter-sidebar .ts-wrapper {
+    margin-bottom: 0;
+}
+
+.filter-sidebar .ts-control {
+    min-height: 42px;
+}
+
+.professional-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.professional-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.professional-actions .btn {
+    flex: 1;
+}
+
+.filter-sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+    margin-bottom: 25px;
+}
+
+.filter-group h6 {
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-dark);
+}
+
+.filter-item {
+    margin-bottom: 10px;
+}
+
+.filter-item input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.filter-item label {
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.search-box {
+    margin-bottom: 30px;
+}
+
+.sort-options {
+    margin-bottom: 30px;
+}
+
+.professional-count {
+    color: #999;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.no-results i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .professional-actions {
+        flex-direction: column;
+    }
+
+    .filter-sidebar {
+        margin-bottom: 30px;
+    }
+}

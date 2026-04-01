@@ -22,6 +22,12 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('professionals.index') }}">
+                        {{ __('labels.nav_professionals') }}
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link" href="#sobre">
                         {{ __('labels.about') }}
                     </a>
