@@ -310,6 +310,17 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     /*
     |--------------------------------------------------------------------------
+    | Categorias de profissionais (home / serviços)
+    |--------------------------------------------------------------------------
+    */
+
+    'professional_categories_title' => 'Categorias de Profissionais',
+    'professional_categories_view_all' => 'Ver Todos',
+    'professional_categories_view_professionals' => 'Ver Profissionais',
+    'professional_categories_empty' => 'Nenhuma categoria disponível no momento.',
+
+    /*
+    |--------------------------------------------------------------------------
     | Estatísticas da landing
     |--------------------------------------------------------------------------
     */
