@@ -24,3 +24,22 @@
     font-size: 0.8125rem;
 }
 
+.professional-setup-card .ts-wrapper.form-select,
+.professional-setup-card .ts-wrapper.single .ts-control {
+    min-height: calc(1.5em + 1rem + 2px);
+    padding: 0.5rem 0.75rem;
+}
+
+.professional-setup-card .description-char-counter {
+    font-size: 0.8125rem;
+}
+
+.professional-setup-card .description-char-counter.is-limit {
+    color: var(--bs-danger);
+    font-weight: 600;
+}
+
+.professional-setup-card .ts-wrapper.is-invalid .ts-control {
+    border-color: var(--bs-form-invalid-border-color);
+}
+

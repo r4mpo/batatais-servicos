@@ -6,9 +6,12 @@
         $__cnpjDefault = $p ? \App\Support\BrazilianDocuments::formatCnpjForDisplay($p->cnpj) : '';
         $__hourlyDefault = $p ? \App\Support\BrazilianDocuments::formatHourlyReaisFromCents($p->hourly_rate_cents) : '';
         $__professionDefault = $p?->profession_id;
+        $__descForCount = old('description', $p?->description ?? '');
+        $__descLen = mb_strlen($__descForCount);
     @endphp
 
     @push('styles')
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.bootstrap5.min.css">
         <link rel="stylesheet" href="{{ asset('css/professional-setup.css') }}">
     @endpush
 
@@ -35,6 +38,7 @@
                             </label>
                             <select id="onboarding_profession_id" name="profession_id" required
                                 class="form-select form-select-lg @error('profession_id') is-invalid @enderror"
+                                data-ts-placeholder="{{ e(__('labels.professional_onboarding_profession_placeholder')) }}"
                                 aria-required="true"
                                 aria-describedby="onboarding_profession_hint{{ $errors->has('profession_id') ? ' onboarding_profession_error' : '' }}"
                                 aria-invalid="{{ $errors->has('profession_id') ? 'true' : 'false' }}">
@@ -176,8 +180,18 @@
                                 <textarea id="onboarding_description" name="description" rows="4" maxlength="5000"
                                     placeholder="{{ __('labels.professional_onboarding_description_placeholder') }}"
                                     class="form-control @error('description') is-invalid @enderror"
-                                    aria-describedby="onboarding_description_hint{{ $errors->has('description') ? ' onboarding_description_error' : '' }}"
+                                    aria-describedby="onboarding_description_count onboarding_description_hint{{ $errors->has('description') ? ' onboarding_description_error' : '' }}"
                                     aria-invalid="{{ $errors->has('description') ? 'true' : 'false' }}">{{ old('description', $p?->description ?? '') }}</textarea>
+                                <div class="d-flex justify-content-end mt-1">
+                                    <span id="onboarding_description_count"
+                                        class="description-char-counter text-muted {{ $__descLen >= 5000 ? 'is-limit' : '' }}"
+                                        role="status"
+                                        aria-live="polite"
+                                        data-max="5000"
+                                        data-template="{{ e(__('labels.professional_onboarding_description_counter')) }}">
+                                        {{ __('labels.professional_onboarding_description_counter', ['current' => $__descLen, 'max' => 5000]) }}
+                                    </span>
+                                </div>
                                 @error('description')
                                     <div id="onboarding_description_error" class="invalid-feedback d-block"
                                         role="alert">
@@ -239,6 +253,73 @@
                     document.addEventListener('DOMContentLoaded', initMasks);
                 } else {
                     initMasks();
+                }
+            })();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
+        <script>
+            /**
+             * Busca na categoria profissional (Tom Select) e contador de caracteres da descrição.
+             * Não interfere no campo de valor em moeda (script dedicado abaixo).
+             */
+            (function() {
+                'use strict';
+
+                function initProfessionSelect() {
+                    var el = document.getElementById('onboarding_profession_id');
+                    if (!el || typeof TomSelect === 'undefined') {
+                        return;
+                    }
+                    var ph = el.getAttribute('data-ts-placeholder') || '';
+                    var ts = new TomSelect(el, {
+                        create: false,
+                        maxOptions: null,
+                        dropdownParent: 'body',
+                        placeholder: ph,
+                        allowEmptyOption: false,
+                        hideSelected: false,
+                    });
+                    if (el.classList.contains('is-invalid') && ts.wrapper) {
+                        ts.wrapper.classList.add('is-invalid', 'rounded');
+                    }
+                }
+
+                function initDescriptionCounter() {
+                    var ta = document.getElementById('onboarding_description');
+                    var out = document.getElementById('onboarding_description_count');
+                    if (!ta || !out) {
+                        return;
+                    }
+                    var max = parseInt(out.getAttribute('data-max'), 10) || 5000;
+                    var template = out.getAttribute('data-template') || ':current / :max';
+
+                    function render() {
+                        var len = ta.value.length;
+                        if (len > max) {
+                            ta.value = ta.value.slice(0, max);
+                            len = max;
+                        }
+                        out.textContent = template.replace(':current', String(len)).replace(':max', String(max));
+                        out.classList.toggle('is-limit', len >= max);
+                    }
+
+                    ta.addEventListener('input', render);
+                    ta.addEventListener('paste', function() {
+                        requestAnimationFrame(render);
+                    });
+                    render();
+                }
+
+                function boot() {
+                    initProfessionSelect();
+                    initDescriptionCounter();
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', boot);
+                } else {
+                    boot();
                 }
             })();
         </script>
