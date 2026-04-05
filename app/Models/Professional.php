@@ -14,6 +14,9 @@ class Professional extends Model
     protected $fillable = [
         'user_id',
         'profession_id',
+        'rg',
+        'cpf',
+        'cnpj',
         'title',
         'description',
         'hourly_rate_cents',

@@ -7,6 +7,7 @@ use App\Models\ProfessionalAvailability;
 use App\Models\ProfessionalReview;
 use App\Models\Profession;
 use App\Models\User;
+use App\Support\BrazilianDocuments;
 use Illuminate\Database\Seeder;
 
 class ProfessionalDemoSeeder extends Seeder
@@ -65,12 +66,15 @@ class ProfessionalDemoSeeder extends Seeder
             $user = User::factory()->create([
                 'name' => $row['name'],
                 'email' => 'profissional.demo.'.($index + 1).'@example.test',
-                'profile' => User::PROFILE_CLIENT,
+                'profile' => User::PROFILE_PROFESSIONAL,
             ]);
 
             $professional = Professional::query()->create([
                 'user_id' => $user->id,
                 'profession_id' => $profession->id,
+                'rg' => sprintf('%s %d.%d.%d', 'MG', 10 + $index, 100 + $index, 100 + $index),
+                'cpf' => BrazilianDocuments::demoCpf($index + 1),
+                'cnpj' => null,
                 'title' => $row['title'],
                 'description' => $row['description'],
                 'hourly_rate_cents' => $row['hourly_rate_cents'],

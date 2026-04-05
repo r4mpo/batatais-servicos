@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     const PROFILE_CONTRACTOR = '000';
-    const PROFILE_CLIENT = '001';
+    const PROFILE_PROFESSIONAL = '001';
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -59,5 +59,10 @@ class User extends Authenticatable
     public function professionalReviews(): HasMany
     {
         return $this->hasMany(ProfessionalReview::class);
+    }
+
+    public function isProfessional(): bool
+    {
+        return $this->profile === self::PROFILE_PROFESSIONAL;
     }
 }

@@ -1,0 +1,26 @@
+.professional-setup-card {
+    border-radius: 0.75rem;
+}
+
+.professional-setup-card .form-label {
+    font-weight: 600;
+}
+
+.professional-setup-lead {
+    border-width: 1px !important;
+}
+
+.letter-spacing-sm {
+    letter-spacing: 0.04em;
+}
+
+/* Garante leitura de erros mesmo com .form-text logo abaixo */
+.professional-setup-card .invalid-feedback.d-block {
+    margin-top: 0.35rem;
+}
+
+.professional-setup-card .form-text {
+    margin-top: 0.35rem;
+    font-size: 0.8125rem;
+}
+

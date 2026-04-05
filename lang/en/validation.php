@@ -179,8 +179,11 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'cpf' => [
+            'invalid' => 'Please enter a valid CPF.',
+        ],
+        'cnpj' => [
+            'invalid' => 'Please enter a valid CNPJ or leave it blank.',
         ],
     ],
 
@@ -195,6 +198,14 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'profession_id' => 'professional category',
+        'rg' => 'ID card (RG)',
+        'cpf' => 'CPF',
+        'cnpj' => 'CNPJ',
+        'title' => 'listing title',
+        'description' => 'description',
+        'hourly_rate_reais' => 'hourly rate',
+    ],
 
 ];

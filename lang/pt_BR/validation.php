@@ -175,8 +175,11 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'mensagem-personalizada',
+        'cpf' => [
+            'invalid' => 'Informe um CPF válido.',
+        ],
+        'cnpj' => [
+            'invalid' => 'Informe um CNPJ válido ou deixe em branco.',
         ],
     ],
 
@@ -197,6 +200,13 @@ return [
         'profile' => 'perfil',
         'password_confirmation' => 'confirmação de senha',
         'current_password' => 'senha atual',
+        'profession_id' => 'categoria profissional',
+        'rg' => 'RG',
+        'cpf' => 'CPF',
+        'cnpj' => 'CNPJ',
+        'title' => 'título do anúncio',
+        'description' => 'descrição',
+        'hourly_rate_reais' => 'valor por hora',
     ],
 
 ];

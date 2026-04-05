@@ -362,6 +362,46 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     /*
     |--------------------------------------------------------------------------
+    | Cadastro completo do profissional
+    |--------------------------------------------------------------------------
+    */
+
+    'professional_onboarding_title' => 'Complete seu cadastro profissional',
+    'professional_onboarding_subtitle' => 'Informe seus dados, documentos e como você aparece na plataforma. Você também pode alterar a senha nesta etapa.',
+    'professional_onboarding_profession' => 'Categoria profissional',
+    'professional_onboarding_profession_placeholder' => 'Selecione…',
+    'professional_onboarding_profession_hint' => 'Escolha a categoria que melhor descreve o serviço que você presta.',
+    'professional_onboarding_documents_section' => 'Documentos e identificação',
+    'professional_onboarding_service_section' => 'Anúncio e valor do serviço',
+    'professional_onboarding_rg' => 'RG',
+    'professional_onboarding_rg_placeholder' => 'Ex.: MG-12.345.678-9',
+    'professional_onboarding_rg_hint' => 'Número do documento de identidade (aceita letras, números e pontuação).',
+    'professional_onboarding_cpf' => 'CPF',
+    'professional_onboarding_cpf_placeholder' => '000.000.000-00',
+    'professional_onboarding_cpf_hint' => 'Digite apenas os números; a máscara é aplicada automaticamente.',
+    'professional_onboarding_cnpj' => 'CNPJ (opcional)',
+    'professional_onboarding_cnpj_placeholder' => '00.000.000/0001-00',
+    'professional_onboarding_cnpj_hint' => 'Preencha apenas se atuar como pessoa jurídica.',
+    'professional_onboarding_title_field' => 'Título do anúncio',
+    'professional_onboarding_title_placeholder' => 'Ex.: Encanador — atendimento em Batatais',
+    'professional_onboarding_title_hint' => 'Uma frase curta que identifica o que você oferece.',
+    'professional_onboarding_description' => 'Descrição',
+    'professional_onboarding_description_placeholder' => 'Experiência, regiões de atendimento, disponibilidade e diferenciais.',
+    'professional_onboarding_description_hint' => 'Opcional. Até 5.000 caracteres.',
+    'professional_onboarding_hourly_rate' => 'Valor por hora (R$)',
+    'professional_onboarding_hourly_placeholder' => '0,00',
+    'professional_onboarding_hourly_hint' => 'Entre R$ 1,00 e R$ 500,00.',
+    'professional_onboarding_password_section' => 'Alterar senha (opcional)',
+    'professional_onboarding_password' => 'Nova senha',
+    'professional_onboarding_password_confirm' => 'Confirmar nova senha',
+    'professional_onboarding_password_confirm_placeholder' => 'Repita a nova senha',
+    'professional_onboarding_password_placeholder' => 'Deixe em branco para manter a senha atual',
+    'professional_onboarding_password_hint' => 'Se alterar, use uma senha forte (regras abaixo do campo em caso de erro).',
+    'professional_onboarding_submit' => 'Salvar e continuar',
+    'professional_onboarding_success' => 'Cadastro profissional concluído. Bem-vindo à sua área!',
+
+    /*
+    |--------------------------------------------------------------------------
     | Estatísticas da landing
     |--------------------------------------------------------------------------
     */

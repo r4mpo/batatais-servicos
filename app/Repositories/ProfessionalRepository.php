@@ -141,4 +141,17 @@ class ProfessionalRepository
                 break;
         }
     }
+
+    public function existsForUserId(int $userId): bool
+    {
+        return Professional::query()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function create(array $attributes): Professional
+    {
+        return Professional::query()->create($attributes);
+    }
 }

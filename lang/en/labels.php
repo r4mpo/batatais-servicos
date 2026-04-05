@@ -64,4 +64,44 @@ return [
     'professionals_rating_stars_label' => ':n out of 5 stars',
     'nav_professionals' => 'Professionals',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Professional onboarding
+    |--------------------------------------------------------------------------
+    */
+
+    'professional_onboarding_title' => 'Complete your professional profile',
+    'professional_onboarding_subtitle' => 'Add your details, documents, and how you appear on the platform. You may also change your password here.',
+    'professional_onboarding_profession' => 'Professional category',
+    'professional_onboarding_profession_placeholder' => 'Select…',
+    'professional_onboarding_profession_hint' => 'Pick the category that best matches the service you provide.',
+    'professional_onboarding_documents_section' => 'Documents and identification',
+    'professional_onboarding_service_section' => 'Listing and pricing',
+    'professional_onboarding_rg' => 'ID (RG)',
+    'professional_onboarding_rg_placeholder' => 'E.g. MG-12.345.678-9',
+    'professional_onboarding_rg_hint' => 'Your identity document number (letters, numbers, and punctuation allowed).',
+    'professional_onboarding_cpf' => 'CPF',
+    'professional_onboarding_cpf_placeholder' => '000.000.000-00',
+    'professional_onboarding_cpf_hint' => 'Digits only; formatting is applied automatically.',
+    'professional_onboarding_cnpj' => 'CNPJ (optional)',
+    'professional_onboarding_cnpj_placeholder' => '00.000.000/0001-00',
+    'professional_onboarding_cnpj_hint' => 'Fill in only if you operate as a legal entity.',
+    'professional_onboarding_title_field' => 'Listing title',
+    'professional_onboarding_title_placeholder' => 'E.g. Plumber — Batatais area',
+    'professional_onboarding_title_hint' => 'A short phrase that describes what you offer.',
+    'professional_onboarding_description' => 'Description',
+    'professional_onboarding_description_placeholder' => 'Experience, service areas, availability, and what makes you stand out.',
+    'professional_onboarding_description_hint' => 'Optional. Up to 5,000 characters.',
+    'professional_onboarding_hourly_rate' => 'Hourly rate (BRL)',
+    'professional_onboarding_hourly_placeholder' => '0,00',
+    'professional_onboarding_hourly_hint' => 'Between R$ 1.00 and R$ 500.00.',
+    'professional_onboarding_password_section' => 'Change password (optional)',
+    'professional_onboarding_password' => 'New password',
+    'professional_onboarding_password_confirm' => 'Confirm new password',
+    'professional_onboarding_password_confirm_placeholder' => 'Repeat the new password',
+    'professional_onboarding_password_placeholder' => 'Leave blank to keep your current password',
+    'professional_onboarding_password_hint' => 'If you change it, choose a strong password (requirements appear below the field if needed).',
+    'professional_onboarding_submit' => 'Save and continue',
+    'professional_onboarding_success' => 'Your professional profile is set up. Welcome to your dashboard!',
+
 ];
