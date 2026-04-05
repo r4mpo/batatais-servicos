@@ -16,7 +16,7 @@
             <ul class="navbar-nav ms-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#servicos">
+                    <a class="nav-link" href="{{ route('home') }}#servicos">
                         {{ __('labels.services') }}
                     </a>
                 </li>
