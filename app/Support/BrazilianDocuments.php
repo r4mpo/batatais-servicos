@@ -2,8 +2,19 @@
 
 namespace App\Support;
 
+/**
+ * Utilitários para validar e formatar CPF/CNPJ e valores auxiliares usados nos formulários brasileiros.
+ *
+ * Não acessa banco de dados; apenas regras puras sobre strings e números.
+ */
 final class BrazilianDocuments
 {
+    /**
+     * Remove tudo que não for dígito da string informada.
+     *
+     * @param  string|null  $value  Texto vindo do formulário ou da base.
+     * @return string  Somente `0-9` ou string vazia.
+     */
     public static function onlyDigits(?string $value): string
     {
         if ($value === null || $value === '') {
@@ -13,6 +24,11 @@ final class BrazilianDocuments
         return preg_replace('/\D/', '', $value) ?? '';
     }
 
+    /**
+     * Valida dígitos verificadores do CPF (11 posições, sem máscara).
+     *
+     * @param  string  $digits  Exatamente 11 caracteres numéricos.
+     */
     public static function isValidCpf(string $digits): bool
     {
         if (strlen($digits) !== 11) {
@@ -37,6 +53,11 @@ final class BrazilianDocuments
         return true;
     }
 
+    /**
+     * Valida dígitos verificadores do CNPJ (14 posições, sem máscara).
+     *
+     * @param  string  $digits  Exatamente 14 caracteres numéricos.
+     */
     public static function isValidCnpj(string $digits): bool
     {
         if (strlen($digits) !== 14) {
@@ -70,6 +91,11 @@ final class BrazilianDocuments
         return (int) $digits[13] === $d2;
     }
 
+    /**
+     * Formata CPF armazenado (só dígitos) para exibição com máscara `000.000.000-00`.
+     *
+     * @param  string|null  $stored  Valor salvo na base; se já estiver inválido em tamanho, devolve sem alterar estrutura.
+     */
     public static function formatCpfForDisplay(?string $stored): string
     {
         if ($stored === null || $stored === '') {
@@ -83,6 +109,11 @@ final class BrazilianDocuments
         return substr($d, 0, 3).'.'.substr($d, 3, 3).'.'.substr($d, 6, 3).'-'.substr($d, 9, 2);
     }
 
+    /**
+     * Formata CNPJ armazenado (só dígitos) para exibição com máscara `00.000.000/0000-00`.
+     *
+     * @param  string|null  $stored  Valor salvo na base.
+     */
     public static function formatCnpjForDisplay(?string $stored): string
     {
         if ($stored === null || $stored === '') {
@@ -96,13 +127,18 @@ final class BrazilianDocuments
         return substr($d, 0, 2).'.'.substr($d, 2, 3).'.'.substr($d, 5, 3).'/'.substr($d, 8, 4).'-'.substr($d, 12, 2);
     }
 
+    /**
+     * Converte valor horário em centavos para string em reais com separadores brasileiros (ex.: `45,50`).
+     */
     public static function formatHourlyReaisFromCents(int $hourlyRateCents): string
     {
         return number_format($hourlyRateCents / 100, 2, ',', '.');
     }
 
     /**
-     * Gera um CPF válido e único por índice (apenas para seed / testes).
+     * Gera um CPF válido e distinto por índice (uso restrito a seeders e testes automatizados).
+     *
+     * @param  int  $index  Sequência para variar os 9 primeiros dígitos antes dos verificadores.
      */
     public static function demoCpf(int $index): string
     {
@@ -112,6 +148,9 @@ final class BrazilianDocuments
         return self::appendCpfCheckDigits($nine);
     }
 
+    /**
+     * Calcula os dois dígitos verificadores e concatena aos 9 primeiros dígitos do CPF.
+     */
     private static function appendCpfCheckDigits(string $nine): string
     {
         $d1 = self::cpfVerifierDigit($nine, 10);
@@ -120,6 +159,12 @@ final class BrazilianDocuments
         return $nine.$d1.$d2;
     }
 
+    /**
+     * Um dígito verificador do CPF conforme posição (algoritmo oficial).
+     *
+     * @param  string  $partial  Bloco parcial do CPF (9 ou 10 dígitos).
+     * @param  int  $factorStart  Fator inicial da multiplicação (10 ou 11).
+     */
     private static function cpfVerifierDigit(string $partial, int $factorStart): int
     {
         $sum = 0;

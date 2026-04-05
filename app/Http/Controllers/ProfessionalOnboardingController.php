@@ -3,70 +3,45 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfessionalOnboardingRequest;
-use App\Repositories\ProfessionRepository;
-use App\Repositories\ProfessionalRepository;
+use App\Services\Professional\ProfessionalOnboardingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
+/**
+ * Controlador HTTP do fluxo de cadastro/edição do perfil profissional.
+ *
+ * Delega regras de negócio ao {@see ProfessionalOnboardingService}.
+ */
 class ProfessionalOnboardingController extends Controller
 {
     public function __construct(
-        private readonly ProfessionRepository $professionRepository,
-        private readonly ProfessionalRepository $professionalRepository,
+        private readonly ProfessionalOnboardingService $onboardingService,
     ) {}
 
+    /**
+     * Exibe o formulário de setup (criação ou edição), quando o usuário é profissional.
+     */
     public function edit(Request $request): RedirectResponse|View
     {
-        $user = $request->user();
-        if (! $user || ! $user->isProfessional()) {
+        $payload = $this->onboardingService->buildSetupViewModel($request->user());
+
+        if ($payload === null) {
             return redirect()->route('dashboard');
         }
 
-        return view('professional.setup', [
-            'professions' => $this->professionRepository->orderedForProfessionalsFilter(),
-            'professional' => $user->professionals()->first(),
-        ]);
+        return view('professional.setup', $payload);
     }
 
+    /**
+     * Processa o envio do formulário de setup já validado pelo {@see ProfessionalOnboardingRequest}.
+     */
     public function store(ProfessionalOnboardingRequest $request): RedirectResponse
     {
-        $user = $request->user();
-        $data = $request->validated();
-
-        $payload = [
-            'profession_id' => (int) $data['profession_id'],
-            'rg' => $data['rg'],
-            'cpf' => $data['cpf'],
-            'cnpj' => $data['cnpj'],
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'hourly_rate_cents' => (int) round((float) $data['hourly_rate_reais'] * 100),
-        ];
-
-        $existing = $user->professionals()->first();
-
-        DB::transaction(function () use ($user, $data, $payload, $existing) {
-            if ($existing !== null) {
-                $this->professionalRepository->update($existing, $payload);
-            } else {
-                $this->professionalRepository->create(array_merge(
-                    ['user_id' => $user->id],
-                    $payload
-                ));
-            }
-
-            if (! empty($data['password'])) {
-                $user->password = Hash::make($data['password']);
-                $user->save();
-            }
-        });
-
-        $status = $existing !== null
-            ? 'professional-profile-updated'
-            : 'professional-onboarding-complete';
+        $status = $this->onboardingService->persistFromValidated(
+            $request->user(),
+            $request->validated()
+        );
 
         return redirect()
             ->route('dashboard')

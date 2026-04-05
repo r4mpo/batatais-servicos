@@ -196,6 +196,9 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
     <script>
+        /**
+         * Comportamentos da barra lateral de filtros da listagem de profissionais (preço, ordenação e categorias).
+         */
         (function () {
             var range = document.getElementById('priceRange');
             var out = document.getElementById('priceValue');
@@ -204,11 +207,13 @@
             var professionSelect = document.getElementById('profession-filter-select');
 
             if (range && out) {
+                /** Atualiza o rótulo numérico ao mover o controle de faixa de preço. */
                 range.addEventListener('input', function () {
                     out.textContent = range.value;
                 });
             }
             if (sort && form) {
+                /** Reenvia o formulário GET ao mudar a ordenação. */
                 sort.addEventListener('change', function () {
                     form.submit();
                 });
@@ -218,6 +223,7 @@
                 var initialSelected = Array.prototype.filter.call(professionSelect.options, function (opt) {
                     return opt.selected;
                 }).length;
+                /** Multi-select com busca; placeholder some quando há categorias selecionadas. */
                 new TomSelect(professionSelect, {
                     plugins: ['remove_button'],
                     placeholder: initialSelected > 0 ? '' : placeholderText,

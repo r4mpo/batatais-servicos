@@ -204,9 +204,16 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/imask@7.6.1/dist/imask.min.js"></script>
         <script>
+            /**
+             * Máscaras de entrada do formulário de cadastro/edição de profissional (CPF, CNPJ e valor em R$).
+             * Não altera o valor inicial dos inputs (preserva `old()` e dados carregados do servidor).
+             */
             (function() {
                 'use strict';
 
+                /**
+                 * Aplica IMask nos campos presentes no DOM; ignora elementos ausentes sem erro.
+                 */
                 function initMasks() {
                     if (typeof IMask === 'undefined') {
                         return;

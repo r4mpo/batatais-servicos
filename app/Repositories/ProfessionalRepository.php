@@ -6,13 +6,22 @@ use App\Models\Professional;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Repositório de acesso a dados da listagem e do cadastro de profissionais.
+ *
+ * Todas as consultas à tabela `professionals` (e joins necessários) passam por aqui.
+ */
 class ProfessionalRepository
 {
+    /** Subconsulta reutilizada para média de avaliações na listagem. */
     private const AVG_RATING_SUBQUERY = '(SELECT AVG(rating) FROM professional_reviews WHERE professional_reviews.professional_id = professionals.id)';
 
     /**
-     * @param  list<int>  $professionIds
-     * @param  list<int>  $weekDayOfWeeks
+     * Lista paginada de profissionais com filtros, ordenação e eager loads usados na página pública.
+     *
+     * @param  list<int>  $professionIds  IDs de categorias selecionadas (filtro).
+     * @param  list<int>  $weekDayOfWeeks  Dias da semana (0–6) para filtro “disponível nesta semana”.
+     * @return LengthAwarePaginator<int, Professional>  Página de modelos {@see Professional} com query string preservada.
      */
     public function paginateForListing(
         int $perPage,
@@ -52,6 +61,8 @@ class ProfessionalRepository
     }
 
     /**
+     * Aplica filtros de busca textual, categoria, nota, preço e disponibilidade ao query builder da listagem.
+     *
      * @param  list<int>  $professionIds
      * @param  list<int>  $weekDayOfWeeks
      */
@@ -110,6 +121,9 @@ class ProfessionalRepository
         }
     }
 
+    /**
+     * Define a ordenação da listagem conforme o critério escolhido (relevância, nota, preço, etc.).
+     */
     private function applyListingSort(Builder $query, string $sort, string $q): void
     {
         $avgSub = self::AVG_RATING_SUBQUERY;
@@ -142,13 +156,29 @@ class ProfessionalRepository
         }
     }
 
+    /**
+     * Indica se já existe ao menos um profissional vinculado ao usuário informado.
+     */
     public function existsForUserId(int $userId): bool
     {
         return Professional::query()->where('user_id', $userId)->exists();
     }
 
     /**
-     * @param  array<string, mixed>  $attributes
+     * Obtém o primeiro registro de profissional do usuário (cadastro único por conta).
+     */
+    public function findFirstForUserId(int $userId): ?Professional
+    {
+        return Professional::query()
+            ->where('user_id', $userId)
+            ->orderBy('id')
+            ->first();
+    }
+
+    /**
+     * Insere um novo registro em `professionals`.
+     *
+     * @param  array<string, mixed>  $attributes  Inclui `user_id`, `profession_id`, documentos, título, etc.
      */
     public function create(array $attributes): Professional
     {
@@ -156,7 +186,9 @@ class ProfessionalRepository
     }
 
     /**
-     * @param  array<string, mixed>  $attributes
+     * Atualiza atributos persistíveis de um profissional já existente.
+     *
+     * @param  array<string, mixed>  $attributes  Campos a sobrescrever (não deve incluir `user_id` em fluxos normais).
      */
     public function update(Professional $professional, array $attributes): void
     {

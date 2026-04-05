@@ -51,16 +51,25 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Perfis de profissional vinculados à conta (normalmente um por usuário no fluxo atual).
+     */
     public function professionals(): HasMany
     {
         return $this->hasMany(Professional::class);
     }
 
+    /**
+     * Avaliações que este usuário deixou em perfis de profissionais.
+     */
     public function professionalReviews(): HasMany
     {
         return $this->hasMany(ProfessionalReview::class);
     }
 
+    /**
+     * Indica se o campo `profile` corresponde ao código de usuário prestador de serviços.
+     */
     public function isProfessional(): bool
     {
         return $this->profile === self::PROFILE_PROFESSIONAL;

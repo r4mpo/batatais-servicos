@@ -8,8 +8,14 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
+/**
+ * Monta os dados da listagem pública de profissionais (filtros, ordenação e paginação).
+ *
+ * Interpreta o {@see Request} e delega consultas aos repositórios.
+ */
 class ProfessionalListingService
 {
+    /** Quantidade fixa de itens por página na listagem. */
     private const PER_PAGE = 12;
 
     public function __construct(
@@ -18,6 +24,8 @@ class ProfessionalListingService
     ) {}
 
     /**
+     * Constrói o conjunto de variáveis enviadas à view `professionals.index`.
+     *
      * @return array{
      *     professionals: LengthAwarePaginator,
      *     filterProfessions: \Illuminate\Database\Eloquent\Collection,
@@ -94,6 +102,9 @@ class ProfessionalListingService
         ];
     }
 
+    /**
+     * Traduz checkboxes de filtro por nota no menor limite de média exigido (ou `null` se filtro desligado).
+     */
     private function resolveMinAverageRating(bool $rating5, bool $rating4): ?float
     {
         if (! $rating5 && ! $rating4) {
@@ -112,6 +123,8 @@ class ProfessionalListingService
     }
 
     /**
+     * Dias da semana (Carbon) de hoje até o fim da semana configurada como domingo, para filtro de disponibilidade.
+     *
      * @return list<int>
      */
     private function weekdaysFromTodayThroughEndOfWeek(): array

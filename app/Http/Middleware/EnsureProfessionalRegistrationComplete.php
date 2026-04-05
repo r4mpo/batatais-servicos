@@ -3,15 +3,26 @@
 namespace App\Http\Middleware;
 
 use App\Models\User;
+use App\Repositories\ProfessionalRepository;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Garante que contas com perfil profissional tenham cadastro em `professionals` antes de usar o restante da área logada.
+ *
+ * A verificação de existência do registro usa apenas o {@see ProfessionalRepository}.
+ */
 class EnsureProfessionalRegistrationComplete
 {
+    public function __construct(
+        private readonly ProfessionalRepository $professionalRepository,
+    ) {}
+
     /**
-     * Profissionais (perfil {@see User::PROFILE_PROFESSIONAL}, valor "001" na base)
-     * sem registro em `professionals` são direcionados ao cadastro completo.
+     * Redireciona para o setup quando falta cadastro; libera rotas do próprio setup e demais perfis sem alteração.
+     *
+     * @param  Closure(Request): Response  $next  Próximo middleware/controller na pilha.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -24,7 +35,7 @@ class EnsureProfessionalRegistrationComplete
             return $next($request);
         }
 
-        if ($user->professionals()->exists()) {
+        if ($this->professionalRepository->existsForUserId($user->id)) {
             return $next($request);
         }
 

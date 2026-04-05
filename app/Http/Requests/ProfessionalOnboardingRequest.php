@@ -3,13 +3,20 @@
 namespace App\Http\Requests;
 
 use App\Models\Professional;
+use App\Repositories\ProfessionalRepository;
 use App\Support\BrazilianDocuments;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Validação e normalização dos dados do formulário de cadastro/edição de profissional.
+ */
 class ProfessionalOnboardingRequest extends FormRequest
 {
+    /**
+     * Permite envio apenas para usuários com perfil profissional autenticados.
+     */
     public function authorize(): bool
     {
         $user = $this->user();
@@ -18,6 +25,8 @@ class ProfessionalOnboardingRequest extends FormRequest
     }
 
     /**
+     * Regras de validação após {@see prepareForValidation()} (CPF/CNPJ já só com dígitos).
+     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
@@ -69,6 +78,9 @@ class ProfessionalOnboardingRequest extends FormRequest
         ];
     }
 
+    /**
+     * Normaliza valores antes das regras: preço em formato BR, documentos só dígitos, senha vazia vira null.
+     */
     protected function prepareForValidation(): void
     {
         $hourly = $this->input('hourly_rate_reais');
@@ -101,8 +113,18 @@ class ProfessionalOnboardingRequest extends FormRequest
         ]);
     }
 
+    /**
+     * Profissional em edição (se existir), resolvido pelo {@see ProfessionalRepository} via container da requisição.
+     */
     private function currentProfessional(): ?Professional
     {
-        return $this->user()?->professionals()->first();
+        $user = $this->user();
+        if ($user === null) {
+            return null;
+        }
+
+        $repository = $this->container->make(ProfessionalRepository::class);
+
+        return $repository->findFirstForUserId($user->id);
     }
 }
