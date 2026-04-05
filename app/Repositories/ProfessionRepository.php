@@ -14,4 +14,18 @@ class ProfessionRepository
             ->orderBy('id')
             ->get();
     }
+
+    public function orderedForProfessionalsFilter(): Collection
+    {
+        return Profession::query()
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug']);
+    }
+
+    public function findIdBySlug(string $slug): ?int
+    {
+        $id = Profession::query()->where('slug', $slug)->value('id');
+
+        return $id !== null ? (int) $id : null;
+    }
 }

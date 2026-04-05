@@ -2,8 +2,8 @@
 
 namespace App\Services\Professional;
 
-use App\Models\Profession;
-use App\Models\Professional;
+use App\Repositories\ProfessionRepository;
+use App\Repositories\ProfessionalRepository;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 class ProfessionalListingService
 {
     private const PER_PAGE = 12;
+
+    public function __construct(
+        private readonly ProfessionRepository $professionRepository,
+        private readonly ProfessionalRepository $professionalRepository,
+    ) {}
 
     /**
      * @return array{
@@ -29,9 +34,7 @@ class ProfessionalListingService
      */
     public function buildListing(Request $request): array
     {
-        $filterProfessions = Profession::query()
-            ->orderBy('title')
-            ->get(['id', 'title', 'slug']);
+        $filterProfessions = $this->professionRepository->orderedForProfessionalsFilter();
 
         $selectedProfessionIds = array_values(array_filter(array_map(
             'intval',
@@ -40,9 +43,9 @@ class ProfessionalListingService
 
         $categoriaSlug = $request->string('categoria')->trim()->toString();
         if ($categoriaSlug !== '' && $selectedProfessionIds === []) {
-            $pid = Profession::query()->where('slug', $categoriaSlug)->value('id');
-            if ($pid) {
-                $selectedProfessionIds = [(int) $pid];
+            $pid = $this->professionRepository->findIdBySlug($categoriaSlug);
+            if ($pid !== null) {
+                $selectedProfessionIds = [$pid];
             }
         }
 
@@ -59,61 +62,25 @@ class ProfessionalListingService
         $availWeek = $request->boolean('avail_week');
         $avail24h = $request->boolean('avail_24h');
 
-        $query = Professional::query()
-            ->with(['user', 'profession'])
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews');
-
-        if ($q !== '') {
-            $term = '%'.$q.'%';
-            $query->where(function ($sub) use ($term) {
-                $sub->where('professionals.title', 'like', $term)
-                    ->orWhere('professionals.description', 'like', $term)
-                    ->orWhereHas('user', function ($uq) use ($term) {
-                        $uq->where('name', 'like', $term);
-                    });
-            });
-        }
-
-        if ($selectedProfessionIds !== []) {
-            $query->whereIn('profession_id', $selectedProfessionIds);
-        }
-
         $minAvg = $this->resolveMinAverageRating($rating5, $rating4);
-        if ($minAvg !== null) {
-            $query->whereRaw(
-                '(SELECT AVG(rating) FROM professional_reviews WHERE professional_reviews.professional_id = professionals.id) >= ?',
-                [$minAvg]
-            );
-        }
+        $weekDays = $availWeek ? $this->weekdaysFromTodayThroughEndOfWeek() : [];
 
-        $maxCents = $maxPriceReais * 100;
-        $query->where('hourly_rate_cents', '<=', $maxCents);
-
-        if ($availToday) {
-            $dow = (int) now()->dayOfWeek;
-            $query->whereHas('availabilities', function ($aq) use ($dow) {
-                $aq->where('day_of_week', $dow);
-            });
-        }
-
-        if ($availWeek) {
-            $days = $this->weekdaysFromTodayThroughEndOfWeek();
-            $query->whereHas('availabilities', function ($aq) use ($days) {
-                $aq->whereIn('day_of_week', $days);
-            });
-        }
-
-        if ($avail24h) {
-            $query->whereHas('availabilities', function ($aq) {
-                $aq->where('is_full_day', true);
-            });
-        }
-
-        $this->applySort($query, $sort, $q);
+        $professionals = $this->professionalRepository->paginateForListing(
+            self::PER_PAGE,
+            $q,
+            $selectedProfessionIds,
+            $minAvg,
+            $maxPriceReais * 100,
+            $availToday,
+            $availWeek,
+            $avail24h,
+            (int) now()->dayOfWeek,
+            $weekDays,
+            $sort,
+        );
 
         return [
-            'professionals' => $query->paginate(self::PER_PAGE)->withQueryString(),
+            'professionals' => $professionals,
             'filterProfessions' => $filterProfessions,
             'selectedProfessionIds' => $selectedProfessionIds,
             'q' => $q,
@@ -159,39 +126,5 @@ class ProfessionalListingService
         }
 
         return array_values(array_unique($days));
-    }
-
-    private function applySort($query, string $sort, string $q): void
-    {
-        $avgSub = '(SELECT AVG(rating) FROM professional_reviews WHERE professional_reviews.professional_id = professionals.id)';
-
-        switch ($sort) {
-            case 'rating':
-                $query->orderByRaw($avgSub.' IS NULL')
-                    ->orderByRaw($avgSub.' DESC');
-                break;
-            case 'price_asc':
-                $query->orderBy('hourly_rate_cents', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('hourly_rate_cents', 'desc');
-                break;
-            case 'recent':
-                $query->orderByDesc('professionals.created_at');
-                break;
-            case 'relevance':
-            default:
-                if ($q !== '') {
-                    $like = '%'.$q.'%';
-                    $query->orderByRaw(
-                        '(CASE WHEN professionals.title LIKE ? OR professionals.description LIKE ? THEN 0 ELSE 1 END)',
-                        [$like, $like]
-                    );
-                }
-                $query->orderByDesc('professionals.updated_at');
-                break;
-        }
-
-        $query->orderBy('professionals.id');
     }
 }
