@@ -467,6 +467,55 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     /*
     |--------------------------------------------------------------------------
+    | Dashboard (área logada)
+    |--------------------------------------------------------------------------
+    */
+
+    'dashboard_title' => 'Painel',
+    'dashboard_alert_dismiss' => 'Fechar',
+
+    'dashboard_contractor_title' => 'Bem-vindo à sua área',
+    'dashboard_contractor_lead' => 'Você está conectado. Use o menu para navegar pelo site ou acesse seu perfil para atualizar dados da conta.',
+    'dashboard_contractor_profile_link' => 'Ir para meu perfil',
+
+    'dashboard_professional_lead' => 'Central do profissional: gerencie seu cadastro, acompanhe indicadores e prepare-se para novas funções da plataforma.',
+    'dashboard_finance_title' => 'Resumo financeiro',
+    'dashboard_finance_disclaimer' => 'Valores ilustrativos — em breve você verá aqui seus ganhos e saques reais.',
+    'dashboard_finance_available_withdrawal' => 'Disponível para saque',
+    'dashboard_finance_net_available' => 'Líquido disponível',
+    'dashboard_finance_total_withdrawn' => 'Total sacado',
+    'dashboard_finance_net_withdrawn' => 'Líquido sacado',
+    'dashboard_finance_sample_available' => 'R$ 1.250,00',
+    'dashboard_finance_sample_net_available' => 'R$ 1.125,00',
+    'dashboard_finance_sample_total_withdrawn' => 'R$ 8.500,00',
+    'dashboard_finance_sample_net_withdrawn' => 'R$ 7.650,00',
+
+    'dashboard_card_professional_title' => 'Cadastro profissional',
+    'dashboard_card_professional_text' => 'Atualize categoria, documentos (RG, CPF, CNPJ), título do anúncio, descrição e valor por hora exibidos na plataforma.',
+    'dashboard_card_professional_btn' => 'Editar cadastro',
+
+    'dashboard_card_certification_title' => 'Verificação e selo',
+    'dashboard_card_certification_text' => 'Em breve: envio de documentos e taxa para análise e exibição do selo de profissional verificado no perfil.',
+    'dashboard_card_certification_btn' => 'Solicitar verificação',
+
+    'dashboard_card_messages_title' => 'Mensagens',
+    'dashboard_card_messages_text' => 'Em breve: histórico de conversas com clientes que entrarem em contato pelo site.',
+    'dashboard_card_messages_btn' => 'Ver mensagens',
+
+    'dashboard_card_history_title' => 'Histórico de serviços',
+    'dashboard_card_history_text' => 'Em breve: lista dos serviços realizados e contratados pela plataforma.',
+    'dashboard_card_history_btn' => 'Ver histórico',
+
+    'dashboard_card_files_title' => 'Arquivos do perfil',
+    'dashboard_card_files_text' => 'Em breve: certificados, fotos e documentos para exibir publicamente no seu perfil.',
+    'dashboard_card_files_btn' => 'Gerenciar arquivos',
+
+    'dashboard_card_password_title' => 'Segurança da conta',
+    'dashboard_card_password_text' => 'Altere sua senha periodicamente. Use combinação longa, com letras, números e símbolos.',
+    'dashboard_card_password_btn' => 'Trocar senha',
+
+    /*
+    |--------------------------------------------------------------------------
     | Footer
     |--------------------------------------------------------------------------
     */

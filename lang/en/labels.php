@@ -106,4 +106,53 @@ return [
     'professional_onboarding_success' => 'Your professional profile is set up. Welcome to your dashboard!',
     'professional_profile_updated_success' => 'Your professional details have been updated.',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard (authenticated area)
+    |--------------------------------------------------------------------------
+    */
+
+    'dashboard_title' => 'Dashboard',
+    'dashboard_alert_dismiss' => 'Dismiss',
+
+    'dashboard_contractor_title' => 'Welcome to your area',
+    'dashboard_contractor_lead' => 'You are signed in. Use the menu to browse the site or open your profile to update account details.',
+    'dashboard_contractor_profile_link' => 'Go to my profile',
+
+    'dashboard_professional_lead' => 'Professional hub: manage your listing, review indicators, and get ready for upcoming platform features.',
+    'dashboard_finance_title' => 'Financial summary',
+    'dashboard_finance_disclaimer' => 'Sample figures — your real earnings and withdrawals will appear here soon.',
+    'dashboard_finance_available_withdrawal' => 'Available to withdraw',
+    'dashboard_finance_net_available' => 'Net available',
+    'dashboard_finance_total_withdrawn' => 'Total withdrawn',
+    'dashboard_finance_net_withdrawn' => 'Net withdrawn',
+    'dashboard_finance_sample_available' => 'R$ 1,250.00',
+    'dashboard_finance_sample_net_available' => 'R$ 1,125.00',
+    'dashboard_finance_sample_total_withdrawn' => 'R$ 8,500.00',
+    'dashboard_finance_sample_net_withdrawn' => 'R$ 7,650.00',
+
+    'dashboard_card_professional_title' => 'Professional profile',
+    'dashboard_card_professional_text' => 'Update category, documents (ID, CPF, CNPJ), listing title, description, and hourly rate shown on the platform.',
+    'dashboard_card_professional_btn' => 'Edit registration',
+
+    'dashboard_card_certification_title' => 'Verification badge',
+    'dashboard_card_certification_text' => 'Coming soon: submit documents and fee for review and a verified professional badge on your profile.',
+    'dashboard_card_certification_btn' => 'Request verification',
+
+    'dashboard_card_messages_title' => 'Messages',
+    'dashboard_card_messages_text' => 'Coming soon: conversation history with clients who contact you through the site.',
+    'dashboard_card_messages_btn' => 'View messages',
+
+    'dashboard_card_history_title' => 'Service history',
+    'dashboard_card_history_text' => 'Coming soon: list of services completed through the platform.',
+    'dashboard_card_history_btn' => 'View history',
+
+    'dashboard_card_files_title' => 'Profile files',
+    'dashboard_card_files_text' => 'Coming soon: certificates, photos, and documents to display publicly on your profile.',
+    'dashboard_card_files_btn' => 'Manage files',
+
+    'dashboard_card_password_title' => 'Account security',
+    'dashboard_card_password_text' => 'Change your password regularly. Prefer a long mix of letters, numbers, and symbols.',
+    'dashboard_card_password_btn' => 'Change password',
+
 ];
