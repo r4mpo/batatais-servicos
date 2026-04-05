@@ -225,8 +225,14 @@
                     hideSelected: true,
                     dropdownParent: 'body',
                     onChange: function (value) {
-                        var empty = !value || value.length === 0;
-                        this.setPlaceholder(empty ? placeholderText : '');
+                        var empty = value == null || value === '' ||
+                            (Array.isArray(value) && value.length === 0);
+                        var ph = empty ? placeholderText : '';
+                        this.settings.placeholder = ph;
+                        if (this.control_input) {
+                            this.control_input.placeholder = ph;
+                        }
+                        this.inputState();
                     },
                 });
             }
