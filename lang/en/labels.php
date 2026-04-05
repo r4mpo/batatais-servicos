@@ -103,5 +103,6 @@ return [
     'professional_onboarding_password_hint' => 'If you change it, choose a strong password (requirements appear below the field if needed).',
     'professional_onboarding_submit' => 'Save and continue',
     'professional_onboarding_success' => 'Your professional profile is set up. Welcome to your dashboard!',
+    'professional_profile_updated_success' => 'Your professional details have been updated.',
 
 ];

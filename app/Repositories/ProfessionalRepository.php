@@ -154,4 +154,12 @@ class ProfessionalRepository
     {
         return Professional::query()->create($attributes);
     }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function update(Professional $professional, array $attributes): void
+    {
+        $professional->update($attributes);
+    }
 }

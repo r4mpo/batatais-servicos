@@ -21,35 +21,42 @@ class ProfessionalOnboardingController extends Controller
     public function edit(Request $request): RedirectResponse|View
     {
         $user = $request->user();
-        if (! $user->isProfessional() || $user->professionals()->exists()) {
+        if (! $user || ! $user->isProfessional()) {
             return redirect()->route('dashboard');
         }
 
         return view('professional.setup', [
             'professions' => $this->professionRepository->orderedForProfessionalsFilter(),
+            'professional' => $user->professionals()->first(),
         ]);
     }
 
     public function store(ProfessionalOnboardingRequest $request): RedirectResponse
     {
         $user = $request->user();
-        if ($user->professionals()->exists()) {
-            return redirect()->route('dashboard');
-        }
-
         $data = $request->validated();
 
-        DB::transaction(function () use ($user, $data) {
-            $this->professionalRepository->create([
-                'user_id' => $user->id,
-                'profession_id' => (int) $data['profession_id'],
-                'rg' => $data['rg'],
-                'cpf' => $data['cpf'],
-                'cnpj' => $data['cnpj'],
-                'title' => $data['title'],
-                'description' => $data['description'] ?? null,
-                'hourly_rate_cents' => (int) round((float) $data['hourly_rate_reais'] * 100),
-            ]);
+        $payload = [
+            'profession_id' => (int) $data['profession_id'],
+            'rg' => $data['rg'],
+            'cpf' => $data['cpf'],
+            'cnpj' => $data['cnpj'],
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'hourly_rate_cents' => (int) round((float) $data['hourly_rate_reais'] * 100),
+        ];
+
+        $existing = $user->professionals()->first();
+
+        DB::transaction(function () use ($user, $data, $payload, $existing) {
+            if ($existing !== null) {
+                $this->professionalRepository->update($existing, $payload);
+            } else {
+                $this->professionalRepository->create(array_merge(
+                    ['user_id' => $user->id],
+                    $payload
+                ));
+            }
 
             if (! empty($data['password'])) {
                 $user->password = Hash::make($data['password']);
@@ -57,8 +64,12 @@ class ProfessionalOnboardingController extends Controller
             }
         });
 
+        $status = $existing !== null
+            ? 'professional-profile-updated'
+            : 'professional-onboarding-complete';
+
         return redirect()
             ->route('dashboard')
-            ->with('status', 'professional-onboarding-complete');
+            ->with('status', $status);
     }
 }

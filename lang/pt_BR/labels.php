@@ -399,6 +399,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'professional_onboarding_password_hint' => 'Se alterar, use uma senha forte (regras abaixo do campo em caso de erro).',
     'professional_onboarding_submit' => 'Salvar e continuar',
     'professional_onboarding_success' => 'Cadastro profissional concluído. Bem-vindo à sua área!',
+    'professional_profile_updated_success' => 'Seus dados profissionais foram atualizados.',
 
     /*
     |--------------------------------------------------------------------------

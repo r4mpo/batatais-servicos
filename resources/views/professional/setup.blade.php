@@ -1,4 +1,13 @@
 <x-app-layout>
+    @php
+        /** @var \App\Models\Professional|null $professional */
+        $p = $professional ?? null;
+        $__cpfDefault = $p ? \App\Support\BrazilianDocuments::formatCpfForDisplay($p->cpf) : '';
+        $__cnpjDefault = $p ? \App\Support\BrazilianDocuments::formatCnpjForDisplay($p->cnpj) : '';
+        $__hourlyDefault = $p ? \App\Support\BrazilianDocuments::formatHourlyReaisFromCents($p->hourly_rate_cents) : '';
+        $__professionDefault = $p?->profession_id;
+    @endphp
+
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/professional-setup.css') }}">
     @endpush
@@ -29,11 +38,11 @@
                                 aria-required="true"
                                 aria-describedby="onboarding_profession_hint{{ $errors->has('profession_id') ? ' onboarding_profession_error' : '' }}"
                                 aria-invalid="{{ $errors->has('profession_id') ? 'true' : 'false' }}">
-                                <option value="" disabled @selected(old('profession_id') === null || old('profession_id') === ''))>
+                                <option value="" disabled @selected(old('profession_id', $__professionDefault) === null || old('profession_id', $__professionDefault) === ''))>
                                     {{ __('labels.professional_onboarding_profession_placeholder') }}
                                 </option>
                                 @foreach ($professions as $profession)
-                                    <option value="{{ $profession->id }}" @selected((string) old('profession_id') === (string) $profession->id)>
+                                    <option value="{{ $profession->id }}" @selected((string) old('profession_id', $__professionDefault) === (string) $profession->id)>
                                         {{ $profession->title }}
                                     </option>
                                 @endforeach
@@ -57,7 +66,7 @@
                                 <label class="form-label fw-semibold" for="onboarding_rg">
                                     {{ __('labels.professional_onboarding_rg') }}
                                 </label>
-                                <input id="onboarding_rg" type="text" name="rg" value="{{ old('rg') }}"
+                                <input id="onboarding_rg" type="text" name="rg" value="{{ old('rg', $p?->rg ?? '') }}"
                                     maxlength="32" required
                                     placeholder="{{ __('labels.professional_onboarding_rg_placeholder') }}"
                                     class="form-control @error('rg') is-invalid @enderror" aria-required="true"
@@ -76,7 +85,7 @@
                                 <label class="form-label fw-semibold" for="onboarding_cpf">
                                     {{ __('labels.professional_onboarding_cpf') }}
                                 </label>
-                                <input id="onboarding_cpf" type="text" name="cpf" value="{{ old('cpf') }}"
+                                <input id="onboarding_cpf" type="text" name="cpf" value="{{ old('cpf', $__cpfDefault) }}"
                                     inputmode="numeric" required
                                     placeholder="{{ __('labels.professional_onboarding_cpf_placeholder') }}"
                                     class="form-control @error('cpf') is-invalid @enderror" aria-required="true"
@@ -95,7 +104,7 @@
                                 <label class="form-label fw-semibold" for="onboarding_cnpj">
                                     {{ __('labels.professional_onboarding_cnpj') }}
                                 </label>
-                                <input id="onboarding_cnpj" type="text" name="cnpj" value="{{ old('cnpj') }}"
+                                <input id="onboarding_cnpj" type="text" name="cnpj" value="{{ old('cnpj', $__cnpjDefault) }}"
                                     inputmode="numeric"
                                     placeholder="{{ __('labels.professional_onboarding_cnpj_placeholder') }}"
                                     class="form-control @error('cnpj') is-invalid @enderror"
@@ -121,7 +130,7 @@
                                 <label class="form-label fw-semibold" for="onboarding_title">
                                     {{ __('labels.professional_onboarding_title_field') }}
                                 </label>
-                                <input id="onboarding_title" type="text" name="title" value="{{ old('title') }}"
+                                <input id="onboarding_title" type="text" name="title" value="{{ old('title', $p?->title ?? '') }}"
                                     maxlength="255" required
                                     placeholder="{{ __('labels.professional_onboarding_title_placeholder') }}"
                                     class="form-control @error('title') is-invalid @enderror" aria-required="true"
@@ -143,7 +152,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text" aria-hidden="true">R$</span>
                                     <input id="onboarding_hourly_rate" type="text" name="hourly_rate_reais"
-                                        value="{{ old('hourly_rate_reais') }}" inputmode="decimal" required
+                                        value="{{ old('hourly_rate_reais', $__hourlyDefault) }}" inputmode="decimal" required
                                         placeholder="{{ __('labels.professional_onboarding_hourly_placeholder') }}"
                                         class="form-control @error('hourly_rate_reais') is-invalid @enderror"
                                         aria-required="true"
@@ -167,7 +176,7 @@
                                     placeholder="{{ __('labels.professional_onboarding_description_placeholder') }}"
                                     class="form-control @error('description') is-invalid @enderror"
                                     aria-describedby="onboarding_description_hint{{ $errors->has('description') ? ' onboarding_description_error' : '' }}"
-                                    aria-invalid="{{ $errors->has('description') ? 'true' : 'false' }}">{{ old('description') }}</textarea>
+                                    aria-invalid="{{ $errors->has('description') ? 'true' : 'false' }}">{{ old('description', $p?->description ?? '') }}</textarea>
                                 @error('description')
                                     <div id="onboarding_description_error" class="invalid-feedback d-block"
                                         role="alert">
@@ -216,6 +225,21 @@
                             mask: '00.000.000/0000-00'
                         });
                     }
+
+                    var rate = document.getElementById('onboarding_hourly_rate');
+                    if (rate) {
+                        IMask(rate, {
+                            mask: Number,
+                            scale: 2,
+                            signed: false,
+                            thousandsSeparator: '.',
+                            radix: ',',
+                            mapToRadix: ['.'],
+                            min: 0,
+                            max: 500,
+                            normalizeZeros: true,
+                        });
+                    }
                 }
 
                 if (document.readyState === 'loading') {
@@ -224,35 +248,6 @@
                     initMasks();
                 }
             })();
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // input de hora
-                const input = document.getElementById('onboarding_hourly_rate');
-                // se não houver input, retorna
-                if (!input) return;
-                // valor inicial
-                input.value = '0,00';
-
-                // adiciona listener de input
-                input.addEventListener('input', function(e) {
-                    // só números
-                    let value = e.target.value.replace(/\D/g, '');
-                    // se não houver valor, define como 0
-                    if (!value) value = '0';
-                    // garante pelo menos 3 dígitos (pra centavos)
-                    value = value.padStart(3, '0');
-                    // separa reais e centavos
-                    let reais = value.slice(0, -2);
-                    let centavos = value.slice(-2);
-                    // remove zeros à esquerda dos reais
-                    reais = reais.replace(/^0+/, '') || '0';
-                    // adiciona separador de milhar
-                    reais = reais.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    // adiciona separador de centavos
-                    e.target.value = `${reais},${centavos}`;
-                });
-            });
         </script>
     @endpush
 </x-app-layout>

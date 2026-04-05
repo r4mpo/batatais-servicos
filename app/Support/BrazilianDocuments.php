@@ -70,6 +70,37 @@ final class BrazilianDocuments
         return (int) $digits[13] === $d2;
     }
 
+    public static function formatCpfForDisplay(?string $stored): string
+    {
+        if ($stored === null || $stored === '') {
+            return '';
+        }
+        $d = self::onlyDigits($stored);
+        if (strlen($d) !== 11) {
+            return $stored;
+        }
+
+        return substr($d, 0, 3).'.'.substr($d, 3, 3).'.'.substr($d, 6, 3).'-'.substr($d, 9, 2);
+    }
+
+    public static function formatCnpjForDisplay(?string $stored): string
+    {
+        if ($stored === null || $stored === '') {
+            return '';
+        }
+        $d = self::onlyDigits($stored);
+        if (strlen($d) !== 14) {
+            return $stored;
+        }
+
+        return substr($d, 0, 2).'.'.substr($d, 2, 3).'.'.substr($d, 5, 3).'/'.substr($d, 8, 4).'-'.substr($d, 12, 2);
+    }
+
+    public static function formatHourlyReaisFromCents(int $hourlyRateCents): string
+    {
+        return number_format($hourlyRateCents / 100, 2, ',', '.');
+    }
+
     /**
      * Gera um CPF válido e único por índice (apenas para seed / testes).
      */

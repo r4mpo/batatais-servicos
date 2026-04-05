@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Professional;
 use App\Support\BrazilianDocuments;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -13,9 +14,7 @@ class ProfessionalOnboardingRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user !== null
-            && $user->isProfessional()
-            && ! $user->professionals()->exists();
+        return $user !== null && $user->isProfessional();
     }
 
     /**
@@ -23,6 +22,8 @@ class ProfessionalOnboardingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $editingId = $this->currentProfessional()?->id;
+
         return [
             'profession_id' => ['required', 'integer', 'exists:professions,id'],
             'rg' => ['required', 'string', 'max:32'],
@@ -36,7 +37,7 @@ class ProfessionalOnboardingRequest extends FormRequest
                         $fail(__('validation.custom.cpf.invalid'));
                     }
                 },
-                Rule::unique('professionals', 'cpf'),
+                Rule::unique('professionals', 'cpf')->ignore($editingId),
             ],
             'cnpj' => [
                 'nullable',
@@ -59,7 +60,7 @@ class ProfessionalOnboardingRequest extends FormRequest
                         $fail(__('validation.custom.cnpj.invalid'));
                     }
                 },
-                Rule::unique('professionals', 'cnpj'),
+                Rule::unique('professionals', 'cnpj')->ignore($editingId),
             ],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
@@ -98,5 +99,10 @@ class ProfessionalOnboardingRequest extends FormRequest
             'cnpj' => $cnpjDigits !== '' ? $cnpjDigits : null,
             'rg' => trim((string) $this->input('rg', '')),
         ]);
+    }
+
+    private function currentProfessional(): ?Professional
+    {
+        return $this->user()?->professionals()->first();
     }
 }
