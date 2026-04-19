@@ -176,6 +176,7 @@ return [
     'professional_files_btn_choose' => 'Choose file',
     'professional_files_btn_upload' => 'Upload',
     'professional_files_confirm_remove_profile' => 'Remove the profile photo?',
+    'professional_files_confirm_remove_image' => 'Delete this image? This cannot be undone.',
     'professional_files_btn_remove_profile' => 'Remove profile photo',
     'professional_files_btn_remove' => 'Remove',
     'professional_files_btn_open' => 'Open',

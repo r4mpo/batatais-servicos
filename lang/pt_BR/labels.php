@@ -535,6 +535,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'professional_files_btn_choose' => 'Escolher arquivo',
     'professional_files_btn_upload' => 'Enviar',
     'professional_files_confirm_remove_profile' => 'Remover a foto de perfil?',
+    'professional_files_confirm_remove_image' => 'Excluir esta imagem? Esta ação não pode ser desfeita.',
     'professional_files_btn_remove_profile' => 'Remover foto de perfil',
     'professional_files_btn_remove' => 'Remover',
     'professional_files_btn_open' => 'Abrir',

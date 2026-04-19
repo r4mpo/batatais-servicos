@@ -81,7 +81,7 @@
                             <x-input-error :messages="$errors->get('photo')" class="small" />
                         </form>
                         @if ($professional->user->profile_photo)
-                            <form method="post" action="{{ route('professional.files.profile-photo.destroy') }}" onsubmit="return confirm({{ json_encode(__('labels.professional_files_confirm_remove_profile')) }});">
+                            <form method="post" action="{{ route('professional.files.profile-photo.destroy') }}" data-confirm="{{ __('labels.professional_files_confirm_remove_profile') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
@@ -127,7 +127,7 @@
                                             <a href="{{ route('professional.files.verification.show', $file) }}" target="_blank" rel="noopener noreferrer" class="d-block">
                                                 <img src="{{ route('professional.files.verification.show', $file) }}" alt="" loading="lazy" class="w-100" style="height: 120px; object-fit: cover;">
                                             </a>
-                                            <form method="post" action="{{ route('professional.files.destroy', $file) }}" class="position-absolute top-0 end-0 p-1">
+                                            <form method="post" action="{{ route('professional.files.destroy', $file) }}" class="position-absolute top-0 end-0 p-1" data-confirm="{{ __('labels.professional_files_confirm_remove_image') }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-dark opacity-75 py-0 px-1" title="{{ __('labels.professional_files_btn_remove') }}" aria-label="{{ __('labels.professional_files_btn_remove') }}">
@@ -168,7 +168,7 @@
                                         <a href="{{ route('professional.files.verification.show', $file) }}" target="_blank" rel="noopener noreferrer" class="d-block">
                                             <img src="{{ route('professional.files.verification.show', $file) }}" alt="" loading="lazy" class="w-100" style="height: 120px; object-fit: cover;">
                                         </a>
-                                        <form method="post" action="{{ route('professional.files.destroy', $file) }}" class="position-absolute top-0 end-0 p-1">
+                                        <form method="post" action="{{ route('professional.files.destroy', $file) }}" class="position-absolute top-0 end-0 p-1" data-confirm="{{ __('labels.professional_files_confirm_remove_image') }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-dark opacity-75 py-0 px-1" title="{{ __('labels.professional_files_btn_remove') }}" aria-label="{{ __('labels.professional_files_btn_remove') }}">
@@ -202,7 +202,7 @@
                             <div class="col-6 col-sm-4 col-md-3">
                                 <div class="professional-files-thumb border rounded overflow-hidden position-relative">
                                     <img src="{{ asset('storage/'.$file->path) }}" alt="" loading="lazy" class="w-100" style="height: 120px; object-fit: cover;">
-                                    <form method="post" action="{{ route('professional.files.destroy', $file) }}" class="position-absolute top-0 end-0 p-1">
+                                    <form method="post" action="{{ route('professional.files.destroy', $file) }}" class="position-absolute top-0 end-0 p-1" data-confirm="{{ __('labels.professional_files_confirm_remove_image') }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-dark opacity-75 py-0 px-1" title="{{ __('labels.professional_files_btn_remove') }}" aria-label="{{ __('labels.professional_files_btn_remove') }}">
@@ -226,4 +226,19 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            (function () {
+                document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+                    form.addEventListener('submit', function (e) {
+                        var msg = form.getAttribute('data-confirm');
+                        if (msg && !window.confirm(msg)) {
+                            e.preventDefault();
+                        }
+                    });
+                });
+            })();
+        </script>
+    @endpush
 </x-app-layout>

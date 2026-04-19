@@ -5,8 +5,11 @@ namespace App\Services\Professional;
 use App\Models\Professional;
 use App\Models\ProfessionalFile;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProfessionalProfileFilesService
 {
@@ -134,9 +137,92 @@ class ProfessionalProfileFilesService
         }
     }
 
+    /**
+     * Remove o registro com soft delete; o arquivo em disco só é apagado em {@see ProfessionalFile} no forceDelete.
+     */
     public function deleteFile(ProfessionalFile $file): void
     {
-        Storage::disk($file->disk)->delete($file->path);
         $file->delete();
+    }
+
+    /**
+     * Resposta HTTP para visualização de documento de verificação (privado).
+     */
+    public function streamVerificationDocument(ProfessionalFile $file): BinaryFileResponse
+    {
+        $absolutePath = Storage::disk($file->disk)->path($file->path);
+
+        return response()->file($absolutePath, [
+            'Content-Disposition' => 'inline; filename="'.basename($file->original_name ?: $file->path).'"',
+        ]);
+    }
+
+    /**
+     * @return RedirectResponse|null  Redirecionamento com erro de limite, ou null para seguir com o upload.
+     */
+    public function redirectIfVerificationLimitsExceeded(
+        Professional $professional,
+        string $documentType,
+        int $incomingCount,
+        Request $request,
+    ): ?RedirectResponse {
+        $existingTotal = $professional->profileFiles()
+            ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
+            ->count();
+
+        $existingForType = $professional->profileFiles()
+            ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
+            ->where('file_type', $documentType)
+            ->count();
+
+        if ($existingTotal + $incomingCount > self::MAX_VERIFICATION_FILES) {
+            return redirect()
+                ->route('professional.files')
+                ->withFragment('doc-'.$documentType)
+                ->withErrors([
+                    'documents' => __('labels.professional_files_verification_limit', [
+                        'max' => self::MAX_VERIFICATION_FILES,
+                    ]),
+                ])
+                ->withInput($request->only('document_type'));
+        }
+
+        if ($existingForType + $incomingCount > self::MAX_VERIFICATION_FILES_PER_TYPE) {
+            return redirect()
+                ->route('professional.files')
+                ->withFragment('doc-'.$documentType)
+                ->withErrors([
+                    'documents' => __('labels.professional_files_verification_limit_per_type', [
+                        'max' => self::MAX_VERIFICATION_FILES_PER_TYPE,
+                    ]),
+                ])
+                ->withInput($request->only('document_type'));
+        }
+
+        return null;
+    }
+
+    /**
+     * @return RedirectResponse|null  Redirecionamento com erro de limite, ou null para seguir com o upload.
+     */
+    public function redirectIfPublicPhotosLimitExceeded(
+        Professional $professional,
+        int $incomingCount,
+    ): ?RedirectResponse {
+        $existing = $professional->profileFiles()
+            ->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
+            ->count();
+
+        if ($existing + $incomingCount > self::MAX_PUBLIC_PHOTOS) {
+            return redirect()
+                ->route('professional.files')
+                ->withErrors([
+                    'photos' => __('labels.professional_files_public_limit', [
+                        'max' => self::MAX_PUBLIC_PHOTOS,
+                    ]),
+                ]);
+        }
+
+        return null;
     }
 }

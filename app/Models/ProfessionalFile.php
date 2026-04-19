@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class ProfessionalFile extends Model
 {
+    use SoftDeletes;
     public const KIND_VERIFICATION_DOCUMENT = 'verification_document';
 
     public const KIND_PUBLIC_PHOTO = 'public_photo';
@@ -42,6 +45,13 @@ class ProfessionalFile extends Model
         return [
             'sort_order' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::forceDeleting(function (ProfessionalFile $file): void {
+            Storage::disk($file->disk)->delete($file->path);
+        });
     }
 
     public function professional(): BelongsTo

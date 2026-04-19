@@ -12,7 +12,6 @@ use App\Repositories\ProfessionalRepository;
 use App\Services\Professional\ProfessionalProfileFilesService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -82,37 +81,14 @@ class ProfessionalProfileFilesController extends Controller
         $documentType = $request->validated('document_type');
         $documents = $request->file('documents', []);
 
-        $existingTotal = $professional->profileFiles()
-            ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
-            ->count();
-
-        $existingForType = $professional->profileFiles()
-            ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
-            ->where('file_type', $documentType)
-            ->count();
-
-        if ($existingTotal + count($documents) > ProfessionalProfileFilesService::MAX_VERIFICATION_FILES) {
-            return redirect()
-                ->route('professional.files')
-                ->withFragment('doc-'.$documentType)
-                ->withErrors([
-                    'documents' => __('labels.professional_files_verification_limit', [
-                        'max' => ProfessionalProfileFilesService::MAX_VERIFICATION_FILES,
-                    ]),
-                ])
-                ->withInput($request->only('document_type'));
-        }
-
-        if ($existingForType + count($documents) > ProfessionalProfileFilesService::MAX_VERIFICATION_FILES_PER_TYPE) {
-            return redirect()
-                ->route('professional.files')
-                ->withFragment('doc-'.$documentType)
-                ->withErrors([
-                    'documents' => __('labels.professional_files_verification_limit_per_type', [
-                        'max' => ProfessionalProfileFilesService::MAX_VERIFICATION_FILES_PER_TYPE,
-                    ]),
-                ])
-                ->withInput($request->only('document_type'));
+        $redirect = $this->filesService->redirectIfVerificationLimitsExceeded(
+            $professional,
+            $documentType,
+            count($documents),
+            $request
+        );
+        if ($redirect !== null) {
+            return $redirect;
         }
 
         $this->filesService->addVerificationDocuments($professional, $documents, $documentType);
@@ -127,18 +103,10 @@ class ProfessionalProfileFilesController extends Controller
     {
         $professional = $this->resolveProfessionalOrAbort($request);
         $photos = $request->file('photos', []);
-        $existing = $professional->profileFiles()
-            ->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
-            ->count();
 
-        if ($existing + count($photos) > ProfessionalProfileFilesService::MAX_PUBLIC_PHOTOS) {
-            return redirect()
-                ->route('professional.files')
-                ->withErrors([
-                    'photos' => __('labels.professional_files_public_limit', [
-                        'max' => ProfessionalProfileFilesService::MAX_PUBLIC_PHOTOS,
-                    ]),
-                ]);
+        $redirect = $this->filesService->redirectIfPublicPhotosLimitExceeded($professional, count($photos));
+        if ($redirect !== null) {
+            return $redirect;
         }
 
         $this->filesService->addPublicPhotos($professional, $photos);
@@ -166,11 +134,7 @@ class ProfessionalProfileFilesController extends Controller
         abort_unless($professional_file->professional_id === $professional->id, 403);
         abort_unless($professional_file->isVerificationDocument(), 404);
 
-        $absolutePath = Storage::disk($professional_file->disk)->path($professional_file->path);
-
-        return response()->file($absolutePath, [
-            'Content-Disposition' => 'inline; filename="'.basename($professional_file->original_name ?: $professional_file->path).'"',
-        ]);
+        return $this->filesService->streamVerificationDocument($professional_file);
     }
 
     private function resolveProfessionalOrAbort(Request $request): Professional

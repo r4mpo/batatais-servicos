@@ -5,12 +5,17 @@ use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProfessionalOnboardingController;
 use App\Http\Controllers\ProfessionalProfileFilesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Middleware\EnsureProfessionalRegistrationComplete;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/profissionais', [ProfessionalController::class, 'index'])->name('professionals.index');
+
+Route::get('/media/perfil/{token}', [ProfilePhotoController::class, 'show'])
+    ->where('token', '[^/]+')
+    ->name('profile.photo');
 
 Route::middleware(['auth', 'verified', EnsureProfessionalRegistrationComplete::class,])->group(function () {
     Route::get('/area-profissional/cadastro', [ProfessionalOnboardingController::class, 'edit'])->name('professional.setup');

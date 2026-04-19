@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\User\UserProfilePhotoService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -83,7 +84,7 @@ class User extends Authenticatable
     }
 
     /**
-     * URL pública da foto de perfil (arquivo em public/{@see PROFILE_PHOTO_PUBLIC_DIR}), ou null.
+     * URL pública da foto de perfil (rota com id criptografado, sem expor o arquivo diretamente).
      */
     public function profilePhotoUrl(): ?string
     {
@@ -91,6 +92,6 @@ class User extends Authenticatable
             return null;
         }
 
-        return asset(self::PROFILE_PHOTO_PUBLIC_DIR.'/'.$this->profile_photo);
+        return app(UserProfilePhotoService::class)->publicUrl($this);
     }
 }
