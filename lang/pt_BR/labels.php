@@ -507,8 +507,50 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'dashboard_card_history_btn' => 'Ver histórico',
 
     'dashboard_card_files_title' => 'Arquivos do perfil',
-    'dashboard_card_files_text' => 'Em breve: certificados, fotos e documentos para exibir publicamente no seu perfil.',
+    'dashboard_card_files_text' => 'Foto para o diretório público, documentos para verificação e fotos da sua vitrine.',
     'dashboard_card_files_btn' => 'Gerenciar arquivos',
+
+    'professional_files_page_title' => 'Arquivos do perfil',
+    'professional_files_intro' => 'Envie sua foto de exibição (aparece na listagem de profissionais), documentos para análise de verificação e fotos públicas para a página do seu perfil.',
+    'professional_files_back_dashboard' => 'Voltar ao painel',
+
+    'professional_files_profile_section' => 'Foto de perfil',
+    'professional_files_profile_help' => 'Esta imagem aparece no card do diretório em /profissionais. Formatos: JPG, PNG, WebP ou GIF. Até 5 MB.',
+
+    'professional_files_verification_section' => 'Documentos para verificação',
+    'professional_files_verification_help' => 'Fotos usadas apenas pela equipe para conferir seu cadastro (armazenamento privado). Limite de :max_total arquivos no total e até :max_per tipo por seção (RG, CPF, certificados, diplomas, CNH).',
+
+    'professional_files_doc_rg' => 'RG (identidade)',
+    'professional_files_doc_cpf' => 'CPF',
+    'professional_files_doc_certificate' => 'Certificados',
+    'professional_files_doc_diploma' => 'Diplomas',
+    'professional_files_doc_cnh' => 'CNH',
+    'professional_files_doc_other' => 'Outros documentos',
+    'professional_files_doc_other_hint' => 'Arquivos enviados antes da separação por tipo. Você pode removê-los e enviar de novo nas seções acima, se preferir.',
+    'professional_files_doc_section_hint' => 'Fotos nítidas; frente e verso podem ser enviados em arquivos separados.',
+
+    'professional_files_public_section' => 'Fotos públicas (vitrine)',
+    'professional_files_public_help' => 'Imagens que poderão ser exibidas na sua página de perfil quando ela estiver disponível. Até :max fotos.',
+
+    'professional_files_btn_choose' => 'Escolher arquivo',
+    'professional_files_btn_upload' => 'Enviar',
+    'professional_files_confirm_remove_profile' => 'Remover a foto de perfil?',
+    'professional_files_btn_remove_profile' => 'Remover foto de perfil',
+    'professional_files_btn_remove' => 'Remover',
+    'professional_files_btn_open' => 'Abrir',
+
+    'professional_files_empty_verification' => 'Nenhum documento enviado ainda.',
+    'professional_files_empty_public' => 'Nenhuma foto pública ainda.',
+
+    'professional_files_verification_limit' => 'Você pode enviar no máximo :max documentos de verificação no total.',
+    'professional_files_verification_limit_per_type' => 'Você pode enviar no máximo :max arquivos nesta seção.',
+    'professional_files_public_limit' => 'Você pode enviar no máximo :max fotos públicas no total.',
+
+    'professional_files_status_profile_updated' => 'Foto de perfil atualizada.',
+    'professional_files_status_profile_removed' => 'Foto de perfil removida.',
+    'professional_files_status_verification_updated' => 'Documentos de verificação enviados.',
+    'professional_files_status_public_updated' => 'Fotos públicas enviadas.',
+    'professional_files_status_file_removed' => 'Arquivo removido.',
 
     'dashboard_card_password_title' => 'Segurança da conta',
     'dashboard_card_password_text' => 'Altere sua senha periodicamente. Use combinação longa, com letras, números e símbolos.',

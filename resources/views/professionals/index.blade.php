@@ -145,7 +145,11 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="card professional-card h-100">
                                     <div class="professional-image" aria-hidden="true">
-                                        {{ $initials !== '' ? $initials : '?' }}
+                                        @if ($professional->user->profilePhotoUrl())
+                                            <img src="{{ $professional->user->profilePhotoUrl() }}" alt="" loading="lazy">
+                                        @else
+                                            {{ $initials !== '' ? $initials : '?' }}
+                                        @endif
                                     </div>
                                     <div class="professional-body">
                                         <div class="professional-name">{{ $professional->user->name }}</div>

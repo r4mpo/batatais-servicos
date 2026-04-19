@@ -148,8 +148,50 @@ return [
     'dashboard_card_history_btn' => 'View history',
 
     'dashboard_card_files_title' => 'Profile files',
-    'dashboard_card_files_text' => 'Coming soon: certificates, photos, and documents to display publicly on your profile.',
+    'dashboard_card_files_text' => 'Photo for the public directory, documents for verification, and showcase photos.',
     'dashboard_card_files_btn' => 'Manage files',
+
+    'professional_files_page_title' => 'Profile files',
+    'professional_files_intro' => 'Upload your display photo (shown on the professionals directory), verification documents for review, and public photos for your future profile page.',
+    'professional_files_back_dashboard' => 'Back to dashboard',
+
+    'professional_files_profile_section' => 'Profile photo',
+    'professional_files_profile_help' => 'Shown on the professional cards in /profissionais. Formats: JPG, PNG, WebP, or GIF. Up to 5 MB.',
+
+    'professional_files_verification_section' => 'Verification documents',
+    'professional_files_verification_help' => 'Photos used only by staff to verify your registration (private storage). Up to :max_total files overall and up to :max_per section for each type (ID, CPF, certificates, diplomas, driver license).',
+
+    'professional_files_doc_rg' => 'Government ID (RG)',
+    'professional_files_doc_cpf' => 'CPF',
+    'professional_files_doc_certificate' => 'Certificates',
+    'professional_files_doc_diploma' => 'Diplomas',
+    'professional_files_doc_cnh' => 'Driver license (CNH)',
+    'professional_files_doc_other' => 'Other documents',
+    'professional_files_doc_other_hint' => 'Files uploaded before document types were split. You may delete them and re-upload under the sections above.',
+    'professional_files_doc_section_hint' => 'Use clear photos; front and back can be separate files.',
+
+    'professional_files_public_section' => 'Public photos (showcase)',
+    'professional_files_public_help' => 'Images that may appear on your profile page when it launches. Up to :max photos.',
+
+    'professional_files_btn_choose' => 'Choose file',
+    'professional_files_btn_upload' => 'Upload',
+    'professional_files_confirm_remove_profile' => 'Remove the profile photo?',
+    'professional_files_btn_remove_profile' => 'Remove profile photo',
+    'professional_files_btn_remove' => 'Remove',
+    'professional_files_btn_open' => 'Open',
+
+    'professional_files_empty_verification' => 'No verification documents uploaded yet.',
+    'professional_files_empty_public' => 'No public photos yet.',
+
+    'professional_files_verification_limit' => 'You can upload at most :max verification documents in total.',
+    'professional_files_verification_limit_per_type' => 'You can upload at most :max files in this section.',
+    'professional_files_public_limit' => 'You can upload at most :max public photos in total.',
+
+    'professional_files_status_profile_updated' => 'Profile photo updated.',
+    'professional_files_status_profile_removed' => 'Profile photo removed.',
+    'professional_files_status_verification_updated' => 'Verification documents uploaded.',
+    'professional_files_status_public_updated' => 'Public photos uploaded.',
+    'professional_files_status_file_removed' => 'File removed.',
 
     'dashboard_card_password_title' => 'Account security',
     'dashboard_card_password_text' => 'Change your password regularly. Prefer a long mix of letters, numbers, and symbols.',

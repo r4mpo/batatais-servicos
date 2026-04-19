@@ -132,10 +132,10 @@
                                 <p class="text-muted small mb-0">{{ __('labels.dashboard_card_files_text') }}</p>
                             </div>
                             <div class="card-footer bg-transparent border-top pt-3">
-                                <button type="button"
+                                <a href="{{ route('professional.files') }}"
                                     class="btn btn-outline-info dashboard-action-btn w-100">
                                     {{ __('labels.dashboard_card_files_btn') }}
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

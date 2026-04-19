@@ -11,7 +11,13 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     const PROFILE_CONTRACTOR = '000';
+
     const PROFILE_PROFESSIONAL = '001';
+
+    /**
+     * Caminho relativo à pasta public/ onde ficam as fotos de perfil (nome do arquivo em hash no banco).
+     */
+    public const PROFILE_PHOTO_PUBLIC_DIR = 'img/docs/profile';
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -25,7 +31,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'profile'
+        'profile',
+        'profile_photo',
     ];
 
     /**
@@ -73,5 +80,17 @@ class User extends Authenticatable
     public function isProfessional(): bool
     {
         return $this->profile === self::PROFILE_PROFESSIONAL;
+    }
+
+    /**
+     * URL pública da foto de perfil (arquivo em public/{@see PROFILE_PHOTO_PUBLIC_DIR}), ou null.
+     */
+    public function profilePhotoUrl(): ?string
+    {
+        if ($this->profile_photo === null || $this->profile_photo === '') {
+            return null;
+        }
+
+        return asset(self::PROFILE_PHOTO_PUBLIC_DIR.'/'.$this->profile_photo);
     }
 }

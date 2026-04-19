@@ -48,4 +48,9 @@ class Professional extends Model
     {
         return $this->hasMany(ProfessionalAvailability::class);
     }
+
+    public function profileFiles(): HasMany
+    {
+        return $this->hasMany(ProfessionalFile::class);
+    }
 }
