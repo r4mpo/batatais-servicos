@@ -9,10 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * Login e logout da área autenticada (sessão web).
+ */
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Exibe o formulário de login.
      */
     public function create(): View
     {
@@ -20,27 +23,27 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Autentica credenciais, regenera o ID de sessão e redireciona para a URL pretendida.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $requisicao): RedirectResponse
     {
-        $request->authenticate();
+        $requisicao->authenticate();
 
-        $request->session()->regenerate();
+        $requisicao->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**
-     * Destroy an authenticated session.
+     * Encerra a sessão atual e invalida o token CSRF.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $requisicao): RedirectResponse
     {
         Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
+        $requisicao->session()->invalidate();
 
-        $request->session()->regenerateToken();
+        $requisicao->session()->regenerateToken();
 
         return redirect('/');
     }

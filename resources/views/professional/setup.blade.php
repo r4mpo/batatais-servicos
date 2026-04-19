@@ -229,7 +229,7 @@
                 /**
                  * Aplica IMask nos campos presentes no DOM; ignora elementos ausentes sem erro.
                  */
-                function initMasks() {
+                function inicializarMascaras() {
                     if (typeof IMask === 'undefined') {
                         return;
                     }
@@ -250,9 +250,9 @@
                 }
 
                 if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', initMasks);
+                    document.addEventListener('DOMContentLoaded', inicializarMascaras);
                 } else {
-                    initMasks();
+                    inicializarMascaras();
                 }
             })();
         </script>
@@ -266,7 +266,7 @@
             (function() {
                 'use strict';
 
-                function initProfessionSelect() {
+                function inicializarSelecaoProfissao() {
                     var el = document.getElementById('onboarding_profession_id');
                     if (!el || typeof TomSelect === 'undefined') {
                         return;
@@ -285,7 +285,7 @@
                     }
                 }
 
-                function initDescriptionCounter() {
+                function inicializarContadorDescricao() {
                     var ta = document.getElementById('onboarding_description');
                     var out = document.getElementById('onboarding_description_count');
                     if (!ta || !out) {
@@ -294,7 +294,7 @@
                     var max = parseInt(out.getAttribute('data-max'), 10) || 5000;
                     var template = out.getAttribute('data-template') || ':current / :max';
 
-                    function render() {
+                    function atualizarContagemDescricao() {
                         var len = ta.value.length;
                         if (len > max) {
                             ta.value = ta.value.slice(0, max);
@@ -304,59 +304,48 @@
                         out.classList.toggle('is-limit', len >= max);
                     }
 
-                    ta.addEventListener('input', render);
+                    ta.addEventListener('input', atualizarContagemDescricao);
                     ta.addEventListener('paste', function() {
-                        requestAnimationFrame(render);
+                        requestAnimationFrame(atualizarContagemDescricao);
                     });
-                    render();
+                    atualizarContagemDescricao();
                 }
 
-                function boot() {
-                    initProfessionSelect();
-                    initDescriptionCounter();
+                function inicializar() {
+                    inicializarSelecaoProfissao();
+                    inicializarContadorDescricao();
                 }
 
                 if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', boot);
+                    document.addEventListener('DOMContentLoaded', inicializar);
                 } else {
-                    boot();
+                    inicializar();
                 }
             })();
         </script>
 
         <script>
-            /* 
-            * Máscara de entrada do formulário de cadastro/edição de profissional (valor em R$).
-            * Não altera o valor inicial dos inputs (preserva `old()` e dados carregados do servidor).
-            */
+            /**
+             * Formatação incremental do valor por hora em R$ (reais + centavos com vírgula).
+             * Não altera o valor inicial além do fallback `0,00` quando vazio (preserva `old()` e dados do servidor).
+             */
             document.addEventListener('DOMContentLoaded', function() {
-                // input de hora
-                const input = document.getElementById('onboarding_hourly_rate');
-                // se não houver input, retorna
-                if (!input) return;
-                // valor inicial
-                input.value = input.value || '0,00';
-                // adiciona listener de input
-                input.addEventListener('input', function(e) {
-                    // só números
-                    let value = e.target.value.replace(/\D/g, '');
-
-                    // se não houver valor, define como 0
-                    if (!value) value = '0';
-
-                    // garante pelo menos 3 dígitos (pra centavos)
-                    value = value.padStart(3, '0');
-
-                    // separa reais e centavos
-                    let reais = value.slice(0, -2);
-                    let centavos = value.slice(-2);
-
-                    // remove zeros à esquerda dos reais
-                    reais = reais.replace(/^0+/, '') || '0';
-                    // adiciona separador de milhar
-                    reais = reais.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    // adiciona separador de centavos
-                    e.target.value = `${reais},${centavos}`;
+                const entradaValorHora = document.getElementById('onboarding_hourly_rate');
+                if (!entradaValorHora) {
+                    return;
+                }
+                entradaValorHora.value = entradaValorHora.value || '0,00';
+                entradaValorHora.addEventListener('input', function(evento) {
+                    let digitos = evento.target.value.replace(/\D/g, '');
+                    if (!digitos) {
+                        digitos = '0';
+                    }
+                    digitos = digitos.padStart(3, '0');
+                    let parteReais = digitos.slice(0, -2);
+                    const parteCentavos = digitos.slice(-2);
+                    parteReais = parteReais.replace(/^0+/, '') || '0';
+                    parteReais = parteReais.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    evento.target.value = parteReais + ',' + parteCentavos;
                 });
             });
         </script>

@@ -6,6 +6,7 @@ use App\Models\ProfessionalFile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/** Valida `document_type` e `documents` dos arquivos de verificação. */
 class ProfessionalVerificationDocumentsRequest extends FormRequest
 {
     public function authorize(): bool

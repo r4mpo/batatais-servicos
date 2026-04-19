@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Valida o campo `photo` no upload da foto de perfil. */
 class ProfessionalProfilePhotoRequest extends FormRequest
 {
     public function authorize(): bool

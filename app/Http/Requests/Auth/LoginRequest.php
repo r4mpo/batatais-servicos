@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Login: validação de campos, tentativa de autenticação e limite de taxa por e-mail+IP.
+ */
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Qualquer visitante pode tentar autenticar (a rota já é guest).
      */
     public function authorize(): bool
     {
@@ -21,7 +24,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Regras mínimas para e-mail e senha antes de chamar {@see authenticate()}.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -34,7 +37,10 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Passo a passo:
+     * 1. Garantir que não estamos em lockout por excesso de tentativas.
+     * 2. Tentar `Auth::attempt` com lembrar-me opcional.
+     * 3. Em falha, registrar tentativa e mensagem genérica; em sucesso, limpar contador.
      *
      * @throws ValidationException
      */
@@ -54,7 +60,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Ensure the login request is not rate limited.
+     * Se o limite de tentativas foi excedido, bloqueia com mensagem contendo tempo restante.
      *
      * @throws ValidationException
      */
@@ -66,18 +72,18 @@ class LoginRequest extends FormRequest
 
         event(new Lockout($this));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $segundosRestantes = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
             'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
+                'seconds' => $segundosRestantes,
+                'minutes' => ceil($segundosRestantes / 60),
             ]),
         ]);
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Chave única para rate limit: e-mail normalizado + IP.
      */
     public function throttleKey(): string
     {

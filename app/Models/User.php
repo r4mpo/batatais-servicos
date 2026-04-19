@@ -84,7 +84,7 @@ class User extends Authenticatable
     }
 
     /**
-     * URL pública da foto de perfil (rota com id criptografado, sem expor o arquivo diretamente).
+     * URL pública da foto (token na rota `profile.photo`; lógica em {@see UserProfilePhotoService::urlPublica()}).
      */
     public function profilePhotoUrl(): ?string
     {
@@ -92,6 +92,6 @@ class User extends Authenticatable
             return null;
         }
 
-        return app(UserProfilePhotoService::class)->publicUrl($this);
+        return app(UserProfilePhotoService::class)->urlPublica($this);
     }
 }

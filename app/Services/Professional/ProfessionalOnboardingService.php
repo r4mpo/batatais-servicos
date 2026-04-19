@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Orquestra o cadastro e a edição do perfil profissional (dados em `professionals` + senha opcional em `users`).
- *
- * Contém a regra de negócio de criar vs. atualizar registro e a transação associada.
+ * Regras do fluxo de cadastro/edição do profissional (`professionals` + senha opcional em `users`).
  */
 class ProfessionalOnboardingService
 {
@@ -23,74 +21,83 @@ class ProfessionalOnboardingService
     ) {}
 
     /**
-     * Monta os dados necessários para renderizar a tela de setup (lista de categorias + profissional atual, se existir).
+     * Dados para a view de setup (categorias + registro atual, se existir).
      *
-     * @param  User|null  $user  Usuário autenticado; fora do perfil profissional não há dados para a view.
-     * @return array{professions: \Illuminate\Database\Eloquent\Collection, professional: \App\Models\Professional|null}|null  Payload da view ou `null` quando o acesso não deve ser concedido.
+     * Passo a passo:
+     * 1. Garantir usuário autenticado com perfil profissional.
+     * 2. Carregar lista de profissões e o primeiro `professionals` da conta.
+     *
+     * @return array{professions: \Illuminate\Database\Eloquent\Collection, professional: \App\Models\Professional|null}|null
      */
-    public function buildSetupViewModel(?User $user): ?array
+    public function montarModeloDaViewDeCadastro(?User $usuario): ?array
     {
-        if ($user === null || ! $user->isProfessional()) {
+        if ($usuario === null || ! $usuario->isProfessional()) {
             return null;
         }
 
         return [
             'professions' => $this->professionRepository->orderedForProfessionalsFilter(),
-            'professional' => $this->professionalRepository->findFirstForUserId($user->id),
+            'professional' => $this->professionalRepository->findFirstForUserId($usuario->id),
         ];
     }
 
     /**
-     * Aplica o formulário validado: grava ou atualiza `professionals` e, se informada, a nova senha em `users`.
+     * Persiste formulário validado: cria ou atualiza `professionals` e, se houver, nova senha.
      *
-     * @param  User  $user  Dono do cadastro profissional.
-     * @param  array<string, mixed>  $validated  Saída de {@see \App\Http\Requests\ProfessionalOnboardingRequest::validated()}.
-     * @return string  Chave de status para flash (`professional-onboarding-complete` ou `professional-profile-updated`).
+     * Passo a passo:
+     * 1. Mapear payload validado para colunas de `professionals` (inclui centavos da hora).
+     * 2. Descobrir se já existe linha do usuário em `professionals`.
+     * 3. Em transação: atualizar ou inserir; se veio senha, atualizar hash em `users`.
+     * 4. Retornar chave de flash conforme criação ou edição.
+     *
+     * @param  array<string, mixed>  $validado
      */
-    public function persistFromValidated(User $user, array $validated): string
+    public function persistirAPartirDoValidado(User $usuario, array $validado): string
     {
-        $payload = $this->mapValidatedToProfessionalPayload($validated);
-        $existing = $this->professionalRepository->findFirstForUserId($user->id);
+        $dadosProfissional = $this->mapearValidadoParaProfissional($validado);
+        $existente = $this->professionalRepository->findFirstForUserId($usuario->id);
 
-        DB::transaction(function () use ($user, $validated, $payload, $existing) {
-            if ($existing !== null) {
-                $this->professionalRepository->update($existing, $payload);
+        DB::transaction(function () use ($usuario, $validado, $dadosProfissional, $existente) {
+            if ($existente !== null) {
+                $this->professionalRepository->update($existente, $dadosProfissional);
             } else {
                 $this->professionalRepository->create(array_merge(
-                    ['user_id' => $user->id],
-                    $payload
+                    ['user_id' => $usuario->id],
+                    $dadosProfissional
                 ));
             }
 
-            if (! empty($validated['password'])) {
+            if (! empty($validado['password'])) {
                 $this->userRepository->updatePasswordHash(
-                    $user,
-                    Hash::make($validated['password'])
+                    $usuario,
+                    Hash::make($validado['password'])
                 );
             }
         });
 
-        return $existing !== null
+        return $existente !== null
             ? 'professional-profile-updated'
             : 'professional-onboarding-complete';
     }
 
     /**
-     * Converte o array validado do request no formato persistido na tabela `professionals`.
+     * Passo a passo:
+     * 1. Copiar ids e textos já normalizados pelo request.
+     * 2. Converter preço em reais (decimal) para `hourly_rate_cents` (inteiro).
      *
-     * @param  array<string, mixed>  $validated  Campos já validados (CPF/CNPJ só dígitos, preço em reais decimal).
-     * @return array<string, mixed>  Atributos aceitos pelo repositório (inclui `hourly_rate_cents`).
+     * @param  array<string, mixed>  $validado
+     * @return array<string, mixed>
      */
-    private function mapValidatedToProfessionalPayload(array $validated): array
+    private function mapearValidadoParaProfissional(array $validado): array
     {
         return [
-            'profession_id' => (int) $validated['profession_id'],
-            'rg' => $validated['rg'],
-            'cpf' => $validated['cpf'],
-            'cnpj' => $validated['cnpj'],
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'hourly_rate_cents' => (int) round((float) $validated['hourly_rate_reais'] * 100),
+            'profession_id' => (int) $validado['profession_id'],
+            'rg' => $validado['rg'],
+            'cpf' => $validado['cpf'],
+            'cnpj' => $validado['cnpj'],
+            'title' => $validado['title'],
+            'description' => $validado['description'] ?? null,
+            'hourly_rate_cents' => (int) round((float) $validado['hourly_rate_reais'] * 100),
         ];
     }
 }

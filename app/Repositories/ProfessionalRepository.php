@@ -79,12 +79,12 @@ class ProfessionalRepository
         array $weekDayOfWeeks,
     ): void {
         if ($q !== '') {
-            $term = '%' . $q . '%';
-            $query->where(function (Builder $sub) use ($term) {
-                $sub->where('professionals.title', 'like', $term)
-                    ->orWhere('professionals.description', 'like', $term)
-                    ->orWhereHas('user', function (Builder $uq) use ($term) {
-                        $uq->where('name', 'like', $term);
+            $padraoLike = '%' . $q . '%';
+            $query->where(function (Builder $consultaExterna) use ($padraoLike) {
+                $consultaExterna->where('professionals.title', 'like', $padraoLike)
+                    ->orWhere('professionals.description', 'like', $padraoLike)
+                    ->orWhereHas('user', function (Builder $subConsultaUsuario) use ($padraoLike) {
+                        $subConsultaUsuario->where('name', 'like', $padraoLike);
                     });
             });
         }
@@ -103,20 +103,20 @@ class ProfessionalRepository
         $query->where('hourly_rate_cents', '<=', $maxHourlyRateCents);
 
         if ($availToday) {
-            $query->whereHas('availabilities', function (Builder $aq) use ($todayDayOfWeek) {
-                $aq->where('day_of_week', $todayDayOfWeek);
+            $query->whereHas('availabilities', function (Builder $subConsultaDisponibilidade) use ($todayDayOfWeek) {
+                $subConsultaDisponibilidade->where('day_of_week', $todayDayOfWeek);
             });
         }
 
         if ($availWeek) {
-            $query->whereHas('availabilities', function (Builder $aq) use ($weekDayOfWeeks) {
-                $aq->whereIn('day_of_week', $weekDayOfWeeks);
+            $query->whereHas('availabilities', function (Builder $subConsultaDisponibilidade) use ($weekDayOfWeeks) {
+                $subConsultaDisponibilidade->whereIn('day_of_week', $weekDayOfWeeks);
             });
         }
 
         if ($avail24h) {
-            $query->whereHas('availabilities', function (Builder $aq) {
-                $aq->where('is_full_day', true);
+            $query->whereHas('availabilities', function (Builder $subConsultaDisponibilidade) {
+                $subConsultaDisponibilidade->where('is_full_day', true);
             });
         }
     }
@@ -145,10 +145,10 @@ class ProfessionalRepository
             case 'relevance':
             default:
                 if ($q !== '') {
-                    $like = '%' . $q . '%';
+                    $padraoLike = '%' . $q . '%';
                     $query->orderByRaw(
                         '(CASE WHEN professionals.title LIKE ? OR professionals.description LIKE ? THEN 0 ELSE 1 END)',
-                        [$like, $like]
+                        [$padraoLike, $padraoLike]
                     );
                 }
                 $query->orderByDesc('professionals.updated_at');

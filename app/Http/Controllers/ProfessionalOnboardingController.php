@@ -22,9 +22,9 @@ class ProfessionalOnboardingController extends Controller
     /**
      * Exibe o formulário de setup (criação ou edição), quando o usuário é profissional.
      */
-    public function edit(Request $request): RedirectResponse|View
+    public function edit(Request $requisicao): RedirectResponse|View
     {
-        $payload = $this->onboardingService->buildSetupViewModel($request->user());
+        $payload = $this->onboardingService->montarModeloDaViewDeCadastro($requisicao->user());
 
         if ($payload === null) {
             return redirect()->route('dashboard');
@@ -36,11 +36,11 @@ class ProfessionalOnboardingController extends Controller
     /**
      * Processa o envio do formulário de setup já validado pelo {@see ProfessionalOnboardingRequest}.
      */
-    public function store(ProfessionalOnboardingRequest $request): RedirectResponse
+    public function store(ProfessionalOnboardingRequest $requisicao): RedirectResponse
     {
-        $status = $this->onboardingService->persistFromValidated(
-            $request->user(),
-            $request->validated()
+        $status = $this->onboardingService->persistirAPartirDoValidado(
+            $requisicao->user(),
+            $requisicao->validated()
         );
 
         return redirect()

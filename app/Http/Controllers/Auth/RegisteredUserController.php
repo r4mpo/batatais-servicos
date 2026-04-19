@@ -13,10 +13,13 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Cadastro público de nova conta (contratante ou profissional).
+ */
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Exibe o formulário de registro.
      */
     public function create(): View
     {
@@ -24,29 +27,29 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
+     * Valida e cria o usuário, dispara evento de registro e autentica na sequência.
      *
      * @throws ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $requisicao): RedirectResponse
     {
-        $request->validate([
+        $requisicao->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'profile' => ['required', 'string', 'in:'.User::PROFILE_CONTRACTOR.','.User::PROFILE_PROFESSIONAL],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'profile' => $request->profile,
-            'password' => Hash::make($request->password),
+        $usuario = User::create([
+            'name' => $requisicao->name,
+            'email' => $requisicao->email,
+            'profile' => $requisicao->profile,
+            'password' => Hash::make($requisicao->password),
         ]);
 
-        event(new Registered($user));
+        event(new Registered($usuario));
 
-        Auth::login($user);
+        Auth::login($usuario);
 
         return redirect(route('dashboard', absolute: false));
     }

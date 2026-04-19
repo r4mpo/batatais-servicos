@@ -9,13 +9,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 /**
- * Monta os dados da listagem pública de profissionais (filtros, ordenação e paginação).
- *
- * Interpreta o {@see Request} e delega consultas aos repositórios.
+ * Regras da listagem pública `/profissionais`: interpretar filtros da query string e montar a página.
  */
 class ProfessionalListingService
 {
-    /** Quantidade fixa de itens por página na listagem. */
+    /** Itens por página na grade. */
     private const PER_PAGE = 12;
 
     public function __construct(
@@ -24,7 +22,16 @@ class ProfessionalListingService
     ) {}
 
     /**
-     * Constrói o conjunto de variáveis enviadas à view `professionals.index`.
+     * Monta todos os dados da view `professionals.index`.
+     *
+     * Passo a passo:
+     * 1. Carregar profissões para o filtro lateral (ordenadas por título).
+     * 2. Ler `profession_id[]`, texto `q`, `sort`, checkboxes de nota, faixa de preço e disponibilidade.
+     * 3. Se vier `categoria` (slug) sem ids selecionados, resolver um único id de profissão.
+     * 4. Normalizar ordenação para um dos valores permitidos.
+     * 5. Converter filtros de nota no piso de média exigido (ou null).
+     * 6. Se “nesta semana” estiver ativo, calcular dias da semana de hoje até domingo.
+     * 7. Chamar o repositório com preço em centavos e paginar.
      *
      * @return array{
      *     professionals: LengthAwarePaginator,
@@ -40,104 +47,108 @@ class ProfessionalListingService
      *     avail_24h: bool
      * }
      */
-    public function buildListing(Request $request): array
+    public function montarListagem(Request $requisicao): array
     {
-        $filterProfessions = $this->professionRepository->orderedForProfessionalsFilter();
+        $profissoesParaFiltro = $this->professionRepository->orderedForProfessionalsFilter();
 
-        $selectedProfessionIds = array_values(array_filter(array_map(
+        $idsProfissoesSelecionados = array_values(array_filter(array_map(
             'intval',
-            (array) $request->input('profession_id', [])
+            (array) $requisicao->input('profession_id', [])
         )));
 
-        $categoriaSlug = $request->string('categoria')->trim()->toString();
-        if ($categoriaSlug !== '' && $selectedProfessionIds === []) {
-            $pid = $this->professionRepository->findIdBySlug($categoriaSlug);
-            if ($pid !== null) {
-                $selectedProfessionIds = [$pid];
+        $slugCategoria = $requisicao->string('categoria')->trim()->toString();
+        if ($slugCategoria !== '' && $idsProfissoesSelecionados === []) {
+            $idPorSlug = $this->professionRepository->findIdBySlug($slugCategoria);
+            if ($idPorSlug !== null) {
+                $idsProfissoesSelecionados = [$idPorSlug];
             }
         }
 
-        $q = $request->string('q')->trim()->toString();
-        $sort = $request->string('sort')->toString();
-        if (! in_array($sort, ['relevance', 'rating', 'price_asc', 'price_desc', 'recent'], true)) {
-            $sort = 'relevance';
+        $textoBusca = $requisicao->string('q')->trim()->toString();
+        $ordenacao = $requisicao->string('sort')->toString();
+        if (! in_array($ordenacao, ['relevance', 'rating', 'price_asc', 'price_desc', 'recent'], true)) {
+            $ordenacao = 'relevance';
         }
 
-        $rating5 = $request->boolean('rating_5');
-        $rating4 = $request->boolean('rating_4');
-        $maxPriceReais = min(500, max(0, (int) $request->input('max_price', 500)));
-        $availToday = $request->boolean('avail_today');
-        $availWeek = $request->boolean('avail_week');
-        $avail24h = $request->boolean('avail_24h');
+        $filtroNota5 = $requisicao->boolean('rating_5');
+        $filtroNota4 = $requisicao->boolean('rating_4');
+        $precoMaxReais = min(500, max(0, (int) $requisicao->input('max_price', 500)));
+        $disponivelHoje = $requisicao->boolean('avail_today');
+        $disponivelSemana = $requisicao->boolean('avail_week');
+        $disponivel24h = $requisicao->boolean('avail_24h');
 
-        $minAvg = $this->resolveMinAverageRating($rating5, $rating4);
-        $weekDays = $availWeek ? $this->weekdaysFromTodayThroughEndOfWeek() : [];
+        $mediaMinima = $this->resolverMediaMinimaPorFiltroDeEstrelas($filtroNota5, $filtroNota4);
+        $diasSemanaParaFiltro = $disponivelSemana ? $this->diasDaSemanaDeHojeAteDomingo() : [];
 
-        $professionals = $this->professionalRepository->paginateForListing(
+        $profissionais = $this->professionalRepository->paginateForListing(
             self::PER_PAGE,
-            $q,
-            $selectedProfessionIds,
-            $minAvg,
-            $maxPriceReais * 100,
-            $availToday,
-            $availWeek,
-            $avail24h,
+            $textoBusca,
+            $idsProfissoesSelecionados,
+            $mediaMinima,
+            $precoMaxReais * 100,
+            $disponivelHoje,
+            $disponivelSemana,
+            $disponivel24h,
             (int) now()->dayOfWeek,
-            $weekDays,
-            $sort,
+            $diasSemanaParaFiltro,
+            $ordenacao,
         );
 
         return [
-            'professionals' => $professionals,
-            'filterProfessions' => $filterProfessions,
-            'selectedProfessionIds' => $selectedProfessionIds,
-            'q' => $q,
-            'sort' => $sort,
-            'rating_5' => $rating5,
-            'rating_4' => $rating4,
-            'max_price_reais' => $maxPriceReais,
-            'avail_today' => $availToday,
-            'avail_week' => $availWeek,
-            'avail_24h' => $avail24h,
+            'professionals' => $profissionais,
+            'filterProfessions' => $profissoesParaFiltro,
+            'selectedProfessionIds' => $idsProfissoesSelecionados,
+            'q' => $textoBusca,
+            'sort' => $ordenacao,
+            'rating_5' => $filtroNota5,
+            'rating_4' => $filtroNota4,
+            'max_price_reais' => $precoMaxReais,
+            'avail_today' => $disponivelHoje,
+            'avail_week' => $disponivelSemana,
+            'avail_24h' => $disponivel24h,
         ];
     }
 
     /**
-     * Traduz checkboxes de filtro por nota no menor limite de média exigido (ou `null` se filtro desligado).
+     * Passo a passo:
+     * 1. Se nenhum filtro de estrela estiver marcado, não exigir média mínima (null).
+     * 2. Caso contrário, usar o menor limite entre 4,5 e 4,0 conforme os checkboxes.
      */
-    private function resolveMinAverageRating(bool $rating5, bool $rating4): ?float
+    private function resolverMediaMinimaPorFiltroDeEstrelas(bool $nota5, bool $nota4): ?float
     {
-        if (! $rating5 && ! $rating4) {
+        if (! $nota5 && ! $nota4) {
             return null;
         }
 
-        $thresholds = [];
-        if ($rating5) {
-            $thresholds[] = 4.5;
+        $limites = [];
+        if ($nota5) {
+            $limites[] = 4.5;
         }
-        if ($rating4) {
-            $thresholds[] = 4.0;
+        if ($nota4) {
+            $limites[] = 4.0;
         }
 
-        return min($thresholds);
+        return min($limites);
     }
 
     /**
-     * Dias da semana (Carbon) de hoje até o fim da semana configurada como domingo, para filtro de disponibilidade.
+     * Passo a passo:
+     * 1. Percorrer do dia atual até o domingo (fim de semana Carbon com domingo).
+     * 2. Coletar `day_of_week` únicos para o filtro em `professional_availabilities`.
      *
      * @return list<int>
      */
-    private function weekdaysFromTodayThroughEndOfWeek(): array
+    private function diasDaSemanaDeHojeAteDomingo(): array
     {
-        $days = [];
+        $dias = [];
         $cursor = now()->startOfDay();
-        $end = now()->copy()->endOfWeek(Carbon::SUNDAY)->startOfDay();
+        $fim = now()->copy()->endOfWeek(Carbon::SUNDAY)->startOfDay();
 
-        while ($cursor->lte($end)) {
-            $days[] = (int) $cursor->dayOfWeek;
+        while ($cursor->lte($fim)) {
+            $dias[] = (int) $cursor->dayOfWeek;
             $cursor->addDay();
         }
 
-        return array_values(array_unique($days));
+        return array_values(array_unique($dias));
     }
 }

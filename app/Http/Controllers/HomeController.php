@@ -20,7 +20,7 @@ class HomeController extends Controller
     public function index(): View
     {
         return view('welcome', [
-            'homepageProfessions' => $this->professionalCategoriesService->getHomepageProfessions(),
+            'homepageProfessions' => $this->professionalCategoriesService->obterProfissoesDaPaginaInicial(),
         ]);
     }
 }

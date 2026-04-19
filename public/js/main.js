@@ -1,63 +1,63 @@
-// Batatais Serviços - JavaScript Principal
-// ==========================================
+// Batatais Serviços — script principal da landing e páginas públicas
+// ================================================================
 
 $(document).ready(function () {
-    // Função para alternar a visibilidade da senha
-    const passwordToggleIcon = document.getElementById('toggle_password_visibility');
-    const passwordConfirmationToggleIcon = document.getElementById('toggle_password_confirmation_visibility');
+    // Alternar visibilidade da senha no cadastro
+    const iconeAlternarSenha = document.getElementById('toggle_password_visibility');
+    const iconeAlternarConfirmacao = document.getElementById('toggle_password_confirmation_visibility');
 
-    const passwordInput = document.getElementById('password');
-    const passwordConfirmationInput = document.getElementById('password_confirmation');
+    const campoSenha = document.getElementById('password');
+    const campoConfirmacaoSenha = document.getElementById('password_confirmation');
 
-    const termsPrivacyCheckbox = document.getElementById('terms_privacy_checkbox');
+    const checkboxTermos = document.getElementById('terms_privacy_checkbox');
 
-    function togglePasswordVisibility(inputElement, iconElement) {
-        if (inputElement.type === "password") {
-            inputElement.type = "text";
-            iconElement.classList.replace("fa-eye", "fa-eye-slash");
+    function alternarVisibilidadeSenha(campo, icone) {
+        if (campo.type === "password") {
+            campo.type = "text";
+            icone.classList.replace("fa-eye", "fa-eye-slash");
         } else {
-            inputElement.type = "password";
-            iconElement.classList.replace("fa-eye-slash", "fa-eye");
+            campo.type = "password";
+            icone.classList.replace("fa-eye-slash", "fa-eye");
         }
     }
 
-    passwordToggleIcon.onclick = function () {
-        togglePasswordVisibility(passwordInput, passwordToggleIcon);
+    iconeAlternarSenha.onclick = function () {
+        alternarVisibilidadeSenha(campoSenha, iconeAlternarSenha);
     };
 
-    passwordConfirmationToggleIcon.onclick = function () {
-        togglePasswordVisibility(passwordConfirmationInput, passwordConfirmationToggleIcon);
+    iconeAlternarConfirmacao.onclick = function () {
+        alternarVisibilidadeSenha(campoConfirmacaoSenha, iconeAlternarConfirmacao);
     };
 
-    termsPrivacyCheckbox.onchange = function () {
-        const submitButton = document.getElementById('btn-send');
-        submitButton.disabled = !this.checked;
+    checkboxTermos.onchange = function () {
+        const botaoEnviar = document.getElementById('btn-send');
+        botaoEnviar.disabled = !this.checked;
     };
 
 
-    // Inicializar tooltips do Bootstrap
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    // Tooltips Bootstrap (landing)
+    var listaGatilhosTooltip = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var listaTooltips = listaGatilhosTooltip.map(function (elementoGatilho) {
+        return new bootstrap.Tooltip(elementoGatilho);
     });
 
-    // Smooth scroll para links internos
-    $('a[href^="#"]').on('click', function (e) {
-        e.preventDefault();
-        var target = $(this.getAttribute('href'));
-        if (target.length) {
+    // Rolagem suave para âncoras internas
+    $('a[href^="#"]').on('click', function (evento) {
+        evento.preventDefault();
+        var alvo = $(this.getAttribute('href'));
+        if (alvo.length) {
             $('html, body').stop().animate({
-                scrollTop: target.offset().top - 100
+                scrollTop: alvo.offset().top - 100
             }, 1000);
         }
     });
 
-    // Feedback visual para botões
+    // Remove foco visual após clique em botões
     $('button').on('click', function () {
         $(this).blur();
     });
 
-    // Animação de scroll suave
+    // Sombra na navbar após rolar a página
     $(window).on('scroll', function () {
         if ($(this).scrollTop() > 100) {
             $('.navbar').addClass('scrolled');
@@ -66,9 +66,9 @@ $(document).ready(function () {
         }
     });
 
-    // Botão voltar ao topo
-    const backToTopBtn = $('<button class="btn btn-primary btn-floating" id="backToTopBtn" style="position: fixed; bottom: 30px; right: 30px; display: none; z-index: 99;"><i class="fas fa-arrow-up"></i></button>');
-    $('body').append(backToTopBtn);
+    // Botão flutuante “voltar ao topo”
+    const botaoVoltarTopo = $('<button class="btn btn-primary btn-floating" id="backToTopBtn" style="position: fixed; bottom: 30px; right: 30px; display: none; z-index: 99;"><i class="fas fa-arrow-up"></i></button>');
+    $('body').append(botaoVoltarTopo);
 
     $(window).on('scroll', function () {
         if ($(this).scrollTop() > 300) {
@@ -82,7 +82,7 @@ $(document).ready(function () {
         $('html, body').animate({ scrollTop: 0 }, 'slow');
     });
 
-    // Estilo do botão flutuante
+    // Estilo injetado do botão flutuante e da navbar com sombra
     $('<style>')
         .text(`
             .btn-floating {

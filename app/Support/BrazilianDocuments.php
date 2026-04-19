@@ -27,6 +27,11 @@ final class BrazilianDocuments
     /**
      * Valida dígitos verificadores do CPF (11 posições, sem máscara).
      *
+     * Passo a passo:
+     * 1. Exigir exatamente 11 dígitos.
+     * 2. Rejeitar sequências repetidas (111…, 000…).
+     * 3. Para cada dígito verificador (posições 9 e 10), recalcular pelo algoritmo oficial e comparar.
+     *
      * @param  string  $digits  Exatamente 11 caracteres numéricos.
      */
     public static function isValidCpf(string $digits): bool
@@ -39,13 +44,13 @@ final class BrazilianDocuments
             return false;
         }
 
-        for ($t = 9; $t < 11; $t++) {
-            $d = 0;
-            for ($c = 0; $c < $t; $c++) {
-                $d += (int) $digits[$c] * (($t + 1) - $c);
+        for ($indiceVerificador = 9; $indiceVerificador < 11; $indiceVerificador++) {
+            $somaPonderada = 0;
+            for ($coluna = 0; $coluna < $indiceVerificador; $coluna++) {
+                $somaPonderada += (int) $digits[$coluna] * (($indiceVerificador + 1) - $coluna);
             }
-            $d = ((10 * $d) % 11) % 10;
-            if ((int) $digits[$t] !== $d) {
+            $digitoEsperado = ((10 * $somaPonderada) % 11) % 10;
+            if ((int) $digits[$indiceVerificador] !== $digitoEsperado) {
                 return false;
             }
         }
@@ -55,6 +60,11 @@ final class BrazilianDocuments
 
     /**
      * Valida dígitos verificadores do CNPJ (14 posições, sem máscara).
+     *
+     * Passo a passo:
+     * 1. Exigir exatamente 14 dígitos e rejeitar sequências repetidas.
+     * 2. Calcular o 13º dígito com pesos fixos nos 12 primeiros.
+     * 3. Calcular o 14º dígito com pesos fixos nos 13 primeiros.
      *
      * @param  string  $digits  Exatamente 14 caracteres numéricos.
      */
@@ -68,27 +78,27 @@ final class BrazilianDocuments
             return false;
         }
 
-        $weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-        $weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        $pesosPrimeiroDigito = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        $pesosSegundoDigito = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-        $sum = 0;
+        $soma = 0;
         for ($i = 0; $i < 12; $i++) {
-            $sum += (int) $digits[$i] * $weights1[$i];
+            $soma += (int) $digits[$i] * $pesosPrimeiroDigito[$i];
         }
-        $r = $sum % 11;
-        $d1 = $r < 2 ? 0 : 11 - $r;
-        if ((int) $digits[12] !== $d1) {
+        $resto = $soma % 11;
+        $primeiroVerificador = $resto < 2 ? 0 : 11 - $resto;
+        if ((int) $digits[12] !== $primeiroVerificador) {
             return false;
         }
 
-        $sum = 0;
+        $soma = 0;
         for ($i = 0; $i < 13; $i++) {
-            $sum += (int) $digits[$i] * $weights2[$i];
+            $soma += (int) $digits[$i] * $pesosSegundoDigito[$i];
         }
-        $r = $sum % 11;
-        $d2 = $r < 2 ? 0 : 11 - $r;
+        $resto = $soma % 11;
+        $segundoVerificador = $resto < 2 ? 0 : 11 - $resto;
 
-        return (int) $digits[13] === $d2;
+        return (int) $digits[13] === $segundoVerificador;
     }
 
     /**
@@ -101,12 +111,12 @@ final class BrazilianDocuments
         if ($stored === null || $stored === '') {
             return '';
         }
-        $d = self::onlyDigits($stored);
-        if (strlen($d) !== 11) {
+        $digitos = self::onlyDigits($stored);
+        if (strlen($digitos) !== 11) {
             return $stored;
         }
 
-        return substr($d, 0, 3).'.'.substr($d, 3, 3).'.'.substr($d, 6, 3).'-'.substr($d, 9, 2);
+        return substr($digitos, 0, 3).'.'.substr($digitos, 3, 3).'.'.substr($digitos, 6, 3).'-'.substr($digitos, 9, 2);
     }
 
     /**
@@ -119,12 +129,12 @@ final class BrazilianDocuments
         if ($stored === null || $stored === '') {
             return '';
         }
-        $d = self::onlyDigits($stored);
-        if (strlen($d) !== 14) {
+        $digitos = self::onlyDigits($stored);
+        if (strlen($digitos) !== 14) {
             return $stored;
         }
 
-        return substr($d, 0, 2).'.'.substr($d, 2, 3).'.'.substr($d, 5, 3).'/'.substr($d, 8, 4).'-'.substr($d, 12, 2);
+        return substr($digitos, 0, 2).'.'.substr($digitos, 2, 3).'.'.substr($digitos, 5, 3).'/'.substr($digitos, 8, 4).'-'.substr($digitos, 12, 2);
     }
 
     /**
@@ -143,9 +153,9 @@ final class BrazilianDocuments
     public static function demoCpf(int $index): string
     {
         $base = 100000000 + ($index * 7919 % 899999999);
-        $nine = str_pad((string) $base, 9, '0', STR_PAD_LEFT);
+        $novePrimeiros = str_pad((string) $base, 9, '0', STR_PAD_LEFT);
 
-        return self::appendCpfCheckDigits($nine);
+        return self::appendCpfCheckDigits($novePrimeiros);
     }
 
     /**
@@ -167,13 +177,13 @@ final class BrazilianDocuments
      */
     private static function cpfVerifierDigit(string $partial, int $factorStart): int
     {
-        $sum = 0;
-        $len = strlen($partial);
-        for ($i = 0; $i < $len; $i++) {
-            $sum += (int) $partial[$i] * ($factorStart - $i);
+        $soma = 0;
+        $comprimento = strlen($partial);
+        for ($i = 0; $i < $comprimento; $i++) {
+            $soma += (int) $partial[$i] * ($factorStart - $i);
         }
-        $r = ($sum * 10) % 11;
+        $resto = ($soma * 10) % 11;
 
-        return $r === 10 ? 0 : $r;
+        return $resto === 10 ? 0 : $resto;
     }
 }

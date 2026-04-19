@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Collection;
 class ProfessionRepository
 {
     /**
-     * Profissões marcadas para exibição na home, ordenadas por ID.
+     * Profissões marcadas para exibição na home (`show_on_homepage`), ordenadas por ID.
      */
-    public function getHomepageProfessions(): Collection
+    public function obterProfissoesDaPaginaInicial(): Collection
     {
         return Profession::query()
             ->where('show_on_homepage', true)

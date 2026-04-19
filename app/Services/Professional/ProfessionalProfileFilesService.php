@@ -11,6 +11,12 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * Regras de negócio dos arquivos ligados ao cadastro profissional (exceto roteamento HTTP).
+ *
+ * Inclui: foto de perfil no {@see User}, documentos de verificação, fotos de vitrine,
+ * soft delete de {@see ProfessionalFile} e montagem de resposta para documento privado.
+ */
 class ProfessionalProfileFilesService
 {
     /** Limite total de arquivos de verificação (todos os tipos). */
@@ -22,198 +28,248 @@ class ProfessionalProfileFilesService
     public const MAX_PUBLIC_PHOTOS = 24;
 
     /**
-     * Foto de perfil: arquivo em public/{@see User::PROFILE_PHOTO_PUBLIC_DIR} com nome em hash; nome salvo em users.profile_photo.
+     * Substitui a foto de perfil: grava arquivo em disco público e atualiza `users.profile_photo`.
+     *
+     * Passo a passo:
+     * 1. Resolver o diretório físico e criá-lo se ainda não existir.
+     * 2. Se já houver nome salvo no usuário, apagar o arquivo antigo do disco.
+     * 3. Gerar nome com hash e mover o upload para o diretório.
+     * 4. Persistir somente o nome do arquivo na coluna `profile_photo`.
      */
-    public function replaceProfilePhoto(User $user, UploadedFile $file): void
+    public function substituirFotoPerfil(User $usuario, UploadedFile $arquivo): void
     {
-        $dir = public_path(User::PROFILE_PHOTO_PUBLIC_DIR);
-        if (! is_dir($dir)) {
-            mkdir($dir, 0755, true);
+        $diretorioPublico = public_path(User::PROFILE_PHOTO_PUBLIC_DIR);
+        if (! is_dir($diretorioPublico)) {
+            mkdir($diretorioPublico, 0755, true);
         }
 
-        if ($user->profile_photo) {
-            $oldPath = $dir.DIRECTORY_SEPARATOR.$user->profile_photo;
-            if (is_file($oldPath)) {
-                @unlink($oldPath);
+        if ($usuario->profile_photo) {
+            $caminhoAntigo = $diretorioPublico.DIRECTORY_SEPARATOR.$usuario->profile_photo;
+            if (is_file($caminhoAntigo)) {
+                @unlink($caminhoAntigo);
             }
         }
 
-        $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
-        $filename = md5($file->getClientOriginalName().strtotime('now').uniqid('', true).'.'.$extension).'.'.$extension;
+        $extensao = strtolower($arquivo->getClientOriginalExtension() ?: 'jpg');
+        $nomeArquivo = md5($arquivo->getClientOriginalName().strtotime('now').uniqid('', true).'.'.$extensao).'.'.$extensao;
 
-        $file->move($dir, $filename);
+        $arquivo->move($diretorioPublico, $nomeArquivo);
 
-        $user->update(['profile_photo' => $filename]);
+        $usuario->update(['profile_photo' => $nomeArquivo]);
     }
 
-    public function clearProfilePhoto(User $user): void
+    /**
+     * Remove foto de perfil: apaga arquivo em disco e zera `users.profile_photo`.
+     *
+     * Passo a passo:
+     * 1. Se não houver nome no banco, encerrar.
+     * 2. Remover arquivo físico se existir.
+     * 3. Atualizar usuário com `profile_photo` nulo.
+     */
+    public function limparFotoPerfil(User $usuario): void
     {
-        if (! $user->profile_photo) {
+        if (! $usuario->profile_photo) {
             return;
         }
 
-        $path = public_path(User::PROFILE_PHOTO_PUBLIC_DIR.DIRECTORY_SEPARATOR.$user->profile_photo);
-        if (is_file($path)) {
-            @unlink($path);
+        $caminhoCompleto = public_path(User::PROFILE_PHOTO_PUBLIC_DIR.DIRECTORY_SEPARATOR.$usuario->profile_photo);
+        if (is_file($caminhoCompleto)) {
+            @unlink($caminhoCompleto);
         }
 
-        $user->update(['profile_photo' => null]);
+        $usuario->update(['profile_photo' => null]);
     }
 
     /**
-     * @param  array<int, UploadedFile>  $files
+     * Grava documentos de verificação no disco local e cria linhas em `professional_files`.
+     *
+     * Passo a passo:
+     * 1. Contar quantos documentos de verificação já existem (total e por `file_type`).
+     * 2. Para cada upload: interromper se algum limite global ou por tipo for atingido.
+     * 3. Armazenar no subdiretório do profissional/tipo e registrar metadados na tabela.
+     *
+     * @param  array<int, UploadedFile>  $arquivos
      */
-    public function addVerificationDocuments(Professional $professional, array $files, string $documentType): void
+    public function adicionarDocumentosVerificacao(Professional $profissional, array $arquivos, string $tipoDocumento): void
     {
-        $total = $professional->profileFiles()
+        $totalGeral = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
             ->count();
 
-        $forType = $professional->profileFiles()
+        $totalNoTipo = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
-            ->where('file_type', $documentType)
+            ->where('file_type', $tipoDocumento)
             ->count();
 
-        $subDir = 'professional-verification/'.$professional->id.'/'.$documentType;
+        $subdiretorio = 'professional-verification/'.$profissional->id.'/'.$tipoDocumento;
 
-        foreach ($files as $file) {
-            if ($total >= self::MAX_VERIFICATION_FILES) {
+        foreach ($arquivos as $arquivo) {
+            if ($totalGeral >= self::MAX_VERIFICATION_FILES) {
                 break;
             }
-            if ($forType >= self::MAX_VERIFICATION_FILES_PER_TYPE) {
+            if ($totalNoTipo >= self::MAX_VERIFICATION_FILES_PER_TYPE) {
                 break;
             }
 
-            $storedPath = $file->store($subDir, 'local');
+            $caminhoArmazenado = $arquivo->store($subdiretorio, 'local');
 
             ProfessionalFile::query()->create([
-                'professional_id' => $professional->id,
+                'professional_id' => $profissional->id,
                 'kind' => ProfessionalFile::KIND_VERIFICATION_DOCUMENT,
-                'file_type' => $documentType,
+                'file_type' => $tipoDocumento,
                 'disk' => 'local',
-                'path' => $storedPath,
-                'original_name' => $file->getClientOriginalName(),
+                'path' => $caminhoArmazenado,
+                'original_name' => $arquivo->getClientOriginalName(),
                 'sort_order' => 0,
             ]);
 
-            $total++;
-            $forType++;
+            $totalGeral++;
+            $totalNoTipo++;
         }
     }
 
     /**
-     * @param  array<int, UploadedFile>  $files
+     * Grava fotos de vitrine no disco `public` e registra em `professional_files`.
+     *
+     * Passo a passo:
+     * 1. Contar fotos públicas atuais e obter o próximo `sort_order`.
+     * 2. Para cada arquivo: parar se o limite máximo for atingido.
+     * 3. `store` na pasta da galeria do profissional e criar registro com `file_type` de vitrine.
+     *
+     * @param  array<int, UploadedFile>  $arquivos
      */
-    public function addPublicPhotos(Professional $professional, array $files): void
+    public function adicionarFotosPublicas(Professional $profissional, array $arquivos): void
     {
-        $current = $professional->profileFiles()
+        $quantidadeAtual = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
             ->count();
 
-        $baseDir = 'professionals/'.$professional->id.'/gallery';
-        $sortOrder = (int) $professional->profileFiles()
+        $pastaGaleria = 'professionals/'.$profissional->id.'/gallery';
+        $ordem = (int) $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
             ->max('sort_order');
 
-        foreach ($files as $file) {
-            if ($current >= self::MAX_PUBLIC_PHOTOS) {
+        foreach ($arquivos as $arquivo) {
+            if ($quantidadeAtual >= self::MAX_PUBLIC_PHOTOS) {
                 break;
             }
 
-            $storedPath = $file->store($baseDir, 'public');
-            $sortOrder++;
+            $caminhoArmazenado = $arquivo->store($pastaGaleria, 'public');
+            $ordem++;
 
             ProfessionalFile::query()->create([
-                'professional_id' => $professional->id,
+                'professional_id' => $profissional->id,
                 'kind' => ProfessionalFile::KIND_PUBLIC_PHOTO,
                 'file_type' => ProfessionalFile::FILE_TYPE_SHOWCASE,
                 'disk' => 'public',
-                'path' => $storedPath,
-                'original_name' => $file->getClientOriginalName(),
-                'sort_order' => $sortOrder,
+                'path' => $caminhoArmazenado,
+                'original_name' => $arquivo->getClientOriginalName(),
+                'sort_order' => $ordem,
             ]);
 
-            $current++;
+            $quantidadeAtual++;
         }
     }
 
     /**
-     * Remove o registro com soft delete; o arquivo em disco só é apagado em {@see ProfessionalFile} no forceDelete.
+     * Exclusão lógica do registro; o arquivo em disco só some no `forceDelete` do modelo.
+     *
+     * Passo a passo:
+     * 1. Executar soft delete (preenche `deleted_at`).
      */
-    public function deleteFile(ProfessionalFile $file): void
+    public function excluirArquivo(ProfessionalFile $arquivo): void
     {
-        $file->delete();
+        $arquivo->delete();
     }
 
     /**
-     * Resposta HTTP para visualização de documento de verificação (privado).
+     * Monta resposta HTTP para exibir um documento de verificação (arquivo no disco privado).
+     *
+     * Passo a passo:
+     * 1. Resolver caminho absoluto com o driver da coluna `disk`.
+     * 2. Devolver `response()->file` com disposition inline.
      */
-    public function streamVerificationDocument(ProfessionalFile $file): BinaryFileResponse
+    public function transmitirDocumentoVerificacao(ProfessionalFile $arquivo): BinaryFileResponse
     {
-        $absolutePath = Storage::disk($file->disk)->path($file->path);
+        $caminhoAbsoluto = Storage::disk($arquivo->disk)->path($arquivo->path);
 
-        return response()->file($absolutePath, [
-            'Content-Disposition' => 'inline; filename="'.basename($file->original_name ?: $file->path).'"',
+        return response()->file($caminhoAbsoluto, [
+            'Content-Disposition' => 'inline; filename="'.basename($arquivo->original_name ?: $arquivo->path).'"',
         ]);
     }
 
     /**
-     * @return RedirectResponse|null  Redirecionamento com erro de limite, ou null para seguir com o upload.
+     * Regra de limite: documentos de verificação (total e por tipo).
+     *
+     * Passo a passo:
+     * 1. Contar existentes (total e por `file_type`).
+     * 2. Se a soma com os novos ultrapassar o limite total, montar redirect com erro.
+     * 3. Senão, se ultrapassar o limite por tipo, idem.
+     * 4. Se estiver dentro dos limites, retornar null para o controller prosseguir.
+     *
+     * @return RedirectResponse|null
      */
-    public function redirectIfVerificationLimitsExceeded(
-        Professional $professional,
-        string $documentType,
-        int $incomingCount,
-        Request $request,
+    public function redirecionarSeLimitesDeVerificacaoExcedidos(
+        Professional $profissional,
+        string $tipoDocumento,
+        int $quantidadeNovos,
+        Request $requisicao,
     ): ?RedirectResponse {
-        $existingTotal = $professional->profileFiles()
+        $totalExistente = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
             ->count();
 
-        $existingForType = $professional->profileFiles()
+        $existenteNoTipo = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
-            ->where('file_type', $documentType)
+            ->where('file_type', $tipoDocumento)
             ->count();
 
-        if ($existingTotal + $incomingCount > self::MAX_VERIFICATION_FILES) {
+        if ($totalExistente + $quantidadeNovos > self::MAX_VERIFICATION_FILES) {
             return redirect()
                 ->route('professional.files')
-                ->withFragment('doc-'.$documentType)
+                ->withFragment('doc-'.$tipoDocumento)
                 ->withErrors([
                     'documents' => __('labels.professional_files_verification_limit', [
                         'max' => self::MAX_VERIFICATION_FILES,
                     ]),
                 ])
-                ->withInput($request->only('document_type'));
+                ->withInput($requisicao->only('document_type'));
         }
 
-        if ($existingForType + $incomingCount > self::MAX_VERIFICATION_FILES_PER_TYPE) {
+        if ($existenteNoTipo + $quantidadeNovos > self::MAX_VERIFICATION_FILES_PER_TYPE) {
             return redirect()
                 ->route('professional.files')
-                ->withFragment('doc-'.$documentType)
+                ->withFragment('doc-'.$tipoDocumento)
                 ->withErrors([
                     'documents' => __('labels.professional_files_verification_limit_per_type', [
                         'max' => self::MAX_VERIFICATION_FILES_PER_TYPE,
                     ]),
                 ])
-                ->withInput($request->only('document_type'));
+                ->withInput($requisicao->only('document_type'));
         }
 
         return null;
     }
 
     /**
-     * @return RedirectResponse|null  Redirecionamento com erro de limite, ou null para seguir com o upload.
+     * Regra de limite: fotos públicas (vitrine).
+     *
+     * Passo a passo:
+     * 1. Contar registros com `kind` de foto pública.
+     * 2. Se existentes + novos excederem o máximo, retornar redirect com erro.
+     * 3. Caso contrário, retornar null.
+     *
+     * @return RedirectResponse|null
      */
-    public function redirectIfPublicPhotosLimitExceeded(
-        Professional $professional,
-        int $incomingCount,
+    public function redirecionarSeLimiteDeFotosPublicasExcedido(
+        Professional $profissional,
+        int $quantidadeNovos,
     ): ?RedirectResponse {
-        $existing = $professional->profileFiles()
+        $existentes = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
             ->count();
 
-        if ($existing + $incomingCount > self::MAX_PUBLIC_PHOTOS) {
+        if ($existentes + $quantidadeNovos > self::MAX_PUBLIC_PHOTOS) {
             return redirect()
                 ->route('professional.files')
                 ->withErrors([

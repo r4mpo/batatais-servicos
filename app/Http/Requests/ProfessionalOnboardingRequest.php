@@ -19,9 +19,9 @@ class ProfessionalOnboardingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $user = $this->user();
+        $usuario = $this->user();
 
-        return $user !== null && $user->isProfessional();
+        return $usuario !== null && $usuario->isProfessional();
     }
 
     /**
@@ -41,8 +41,8 @@ class ProfessionalOnboardingRequest extends FormRequest
                 'string',
                 'size:11',
                 function (string $attribute, mixed $value, \Closure $fail) {
-                    $digits = is_string($value) ? $value : '';
-                    if (! BrazilianDocuments::isValidCpf($digits)) {
+                    $digitos = is_string($value) ? $value : '';
+                    if (! BrazilianDocuments::isValidCpf($digitos)) {
                         $fail(__('validation.custom.cpf.invalid'));
                     }
                 },
@@ -83,23 +83,23 @@ class ProfessionalOnboardingRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        $hourly = $this->input('hourly_rate_reais');
-        if (is_string($hourly)) {
-            $t = trim($hourly);
-            if (str_contains($t, ',')) {
-                $t = str_replace(['.', ' '], '', $t);
-                $t = str_replace(',', '.', $t);
+        $valorHora = $this->input('hourly_rate_reais');
+        if (is_string($valorHora)) {
+            $textoNormalizado = trim($valorHora);
+            if (str_contains($textoNormalizado, ',')) {
+                $textoNormalizado = str_replace(['.', ' '], '', $textoNormalizado);
+                $textoNormalizado = str_replace(',', '.', $textoNormalizado);
             }
-            $this->merge(['hourly_rate_reais' => $t]);
-        } elseif (is_numeric($hourly)) {
-            $this->merge(['hourly_rate_reais' => (string) $hourly]);
+            $this->merge(['hourly_rate_reais' => $textoNormalizado]);
+        } elseif (is_numeric($valorHora)) {
+            $this->merge(['hourly_rate_reais' => (string) $valorHora]);
         }
 
-        $cpf = BrazilianDocuments::onlyDigits((string) $this->input('cpf', ''));
-        $cnpjDigits = BrazilianDocuments::onlyDigits((string) $this->input('cnpj', ''));
+        $cpfDigitos = BrazilianDocuments::onlyDigits((string) $this->input('cpf', ''));
+        $cnpjDigitos = BrazilianDocuments::onlyDigits((string) $this->input('cnpj', ''));
 
-        $pw = $this->input('password');
-        if ($pw === '' || $pw === null) {
+        $senhaInformada = $this->input('password');
+        if ($senhaInformada === '' || $senhaInformada === null) {
             $this->merge([
                 'password' => null,
                 'password_confirmation' => null,
@@ -107,8 +107,8 @@ class ProfessionalOnboardingRequest extends FormRequest
         }
 
         $this->merge([
-            'cpf' => $cpf,
-            'cnpj' => $cnpjDigits !== '' ? $cnpjDigits : null,
+            'cpf' => $cpfDigitos,
+            'cnpj' => $cnpjDigitos !== '' ? $cnpjDigitos : null,
             'rg' => trim((string) $this->input('rg', '')),
         ]);
     }
@@ -118,13 +118,13 @@ class ProfessionalOnboardingRequest extends FormRequest
      */
     private function currentProfessional(): ?Professional
     {
-        $user = $this->user();
-        if ($user === null) {
+        $usuario = $this->user();
+        if ($usuario === null) {
             return null;
         }
 
-        $repository = $this->container->make(ProfessionalRepository::class);
+        $repositorio = $this->container->make(ProfessionalRepository::class);
 
-        return $repository->findFirstForUserId($user->id);
+        return $repositorio->findFirstForUserId($usuario->id);
     }
 }

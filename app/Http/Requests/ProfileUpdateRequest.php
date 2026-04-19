@@ -7,10 +7,13 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Atualização de nome e e-mail na área de perfil.
+ */
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * Get the validation rules that apply to the request.
+     * Regras: nome obrigatório; e-mail único exceto o próprio usuário.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

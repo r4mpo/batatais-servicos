@@ -132,15 +132,15 @@
                     <div class="row g-4">
                         @foreach ($professionals as $professional)
                             @php
-                                $parts = preg_split('/\s+/', trim($professional->user->name));
-                                $initials = '';
-                                foreach (array_slice($parts, 0, 2) as $p) {
-                                    $initials .= mb_strtoupper(mb_substr($p, 0, 1));
+                                $partesNome = preg_split('/\s+/', trim($professional->user->name));
+                                $iniciais = '';
+                                foreach (array_slice($partesNome, 0, 2) as $trechoNome) {
+                                    $iniciais .= mb_strtoupper(mb_substr($trechoNome, 0, 1));
                                 }
-                                $avg = $professional->reviews_avg_rating !== null
+                                $mediaEstrelas = $professional->reviews_avg_rating !== null
                                     ? round((float) $professional->reviews_avg_rating)
                                     : 0;
-                                $priceFormatted = number_format($professional->hourly_rate_cents / 100, 2, ',', '.');
+                                $precoFormatado = number_format($professional->hourly_rate_cents / 100, 2, ',', '.');
                             @endphp
                             <div class="col-md-6 col-lg-4">
                                 <div class="card professional-card h-100">
@@ -148,16 +148,16 @@
                                         @if ($professional->user->profilePhotoUrl())
                                             <img src="{{ $professional->user->profilePhotoUrl() }}" alt="" loading="lazy">
                                         @else
-                                            {{ $initials !== '' ? $initials : '?' }}
+                                            {{ $iniciais !== '' ? $iniciais : '?' }}
                                         @endif
                                     </div>
                                     <div class="professional-body">
                                         <div class="professional-name">{{ $professional->user->name }}</div>
                                         <div class="professional-category">{{ $professional->profession->title }}</div>
                                         <div class="professional-rating">
-                                            <div class="stars" aria-label="{{ __('labels.professionals_rating_stars_label', ['n' => $avg]) }}">
+                                            <div class="stars" aria-label="{{ __('labels.professionals_rating_stars_label', ['n' => $mediaEstrelas]) }}">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    @if ($i <= $avg)
+                                                    @if ($i <= $mediaEstrelas)
                                                         <i class="fas fa-star"></i>
                                                     @else
                                                         <i class="far fa-star"></i>
@@ -169,7 +169,7 @@
                                             </div>
                                         </div>
                                         <div class="professional-price">
-                                            R$ {{ $priceFormatted }}<span class="fs-6 fw-normal">/{{ __('labels.professionals_per_hour') }}</span>
+                                            R$ {{ $precoFormatado }}<span class="fs-6 fw-normal">/{{ __('labels.professionals_per_hour') }}</span>
                                         </div>
                                         <div class="professional-description">
                                             {{ \Illuminate\Support\Str::limit($professional->description, 160) }}
@@ -204,40 +204,40 @@
          * Comportamentos da barra lateral de filtros da listagem de profissionais (preço, ordenação e categorias).
          */
         (function () {
-            var range = document.getElementById('priceRange');
-            var out = document.getElementById('priceValue');
-            var sort = document.getElementById('sortSelect');
-            var form = document.getElementById('professionals-filters-form');
-            var professionSelect = document.getElementById('profession-filter-select');
+            var faixaPreco = document.getElementById('priceRange');
+            var rotuloPreco = document.getElementById('priceValue');
+            var selecaoOrdenacao = document.getElementById('sortSelect');
+            var formularioFiltros = document.getElementById('professionals-filters-form');
+            var selecaoCategorias = document.getElementById('profession-filter-select');
 
-            if (range && out) {
-                /** Atualiza o rótulo numérico ao mover o controle de faixa de preço. */
-                range.addEventListener('input', function () {
-                    out.textContent = range.value;
+            if (faixaPreco && rotuloPreco) {
+                /** Passo: ao mover a faixa, atualizar o número exibido ao lado. */
+                faixaPreco.addEventListener('input', function () {
+                    rotuloPreco.textContent = faixaPreco.value;
                 });
             }
-            if (sort && form) {
-                /** Reenvia o formulário GET ao mudar a ordenação. */
-                sort.addEventListener('change', function () {
-                    form.submit();
+            if (selecaoOrdenacao && formularioFiltros) {
+                /** Passo: mudar ordenação dispara novo GET com os mesmos filtros. */
+                selecaoOrdenacao.addEventListener('change', function () {
+                    formularioFiltros.submit();
                 });
             }
-            if (professionSelect && typeof TomSelect !== 'undefined') {
-                var placeholderText = professionSelect.getAttribute('data-placeholder') || '';
-                var initialSelected = Array.prototype.filter.call(professionSelect.options, function (opt) {
-                    return opt.selected;
+            if (selecaoCategorias && typeof TomSelect !== 'undefined') {
+                var textoPlaceholder = selecaoCategorias.getAttribute('data-placeholder') || '';
+                var quantidadeSelecionadas = Array.prototype.filter.call(selecaoCategorias.options, function (opcao) {
+                    return opcao.selected;
                 }).length;
                 /** Multi-select com busca; placeholder some quando há categorias selecionadas. */
-                new TomSelect(professionSelect, {
+                new TomSelect(selecaoCategorias, {
                     plugins: ['remove_button'],
-                    placeholder: initialSelected > 0 ? '' : placeholderText,
+                    placeholder: quantidadeSelecionadas > 0 ? '' : textoPlaceholder,
                     maxOptions: null,
                     hideSelected: true,
                     dropdownParent: 'body',
                     onChange: function (value) {
                         var empty = value == null || value === '' ||
                             (Array.isArray(value) && value.length === 0);
-                        var ph = empty ? placeholderText : '';
+                        var ph = empty ? textoPlaceholder : '';
                         this.settings.placeholder = ph;
                         if (this.control_input) {
                             this.control_input.placeholder = ph;

@@ -9,51 +9,54 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+/**
+ * Área logada: edição de dados básicos da conta e exclusão da conta.
+ */
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Exibe o formulário de perfil (nome, e-mail).
      */
-    public function edit(Request $request): View
+    public function edit(Request $requisicao): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $requisicao->user(),
         ]);
     }
 
     /**
-     * Update the user's profile information.
+     * Atualiza nome/e-mail; se o e-mail mudar, invalida a verificação.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $requisicao): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $requisicao->user()->fill($requisicao->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($requisicao->user()->isDirty('email')) {
+            $requisicao->user()->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $requisicao->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
-     * Delete the user's account.
+     * Remove a conta após confirmar a senha atual; encerra sessão e invalida token CSRF.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $requisicao): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
+        $requisicao->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
-        $user = $request->user();
+        $usuario = $requisicao->user();
 
         Auth::logout();
 
-        $user->delete();
+        $usuario->delete();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $requisicao->session()->invalidate();
+        $requisicao->session()->regenerateToken();
 
         return Redirect::to('/');
     }

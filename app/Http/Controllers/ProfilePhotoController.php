@@ -6,7 +6,7 @@ use App\Services\User\UserProfilePhotoService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
- * Entrega da foto de perfil pública via token criptografado (sem id na URL).
+ * Rota pública GET `/media/perfil/{token}`: delega ao {@see UserProfilePhotoService}.
  */
 class ProfilePhotoController extends Controller
 {
@@ -14,8 +14,9 @@ class ProfilePhotoController extends Controller
         private readonly UserProfilePhotoService $profilePhotoService,
     ) {}
 
+    /** Passo único: entregar arquivo conforme token (regras no service). */
     public function show(string $token): BinaryFileResponse
     {
-        return $this->profilePhotoService->serve($token);
+        return $this->profilePhotoService->entregarArquivo($token);
     }
 }

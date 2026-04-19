@@ -47,10 +47,13 @@ class ProfessionalFile extends Model
         ];
     }
 
+    /**
+     * Em exclusão definitiva (`forceDelete`): remove bytes do storage conforme colunas `disk` e `path`.
+     */
     protected static function booted(): void
     {
-        static::forceDeleting(function (ProfessionalFile $file): void {
-            Storage::disk($file->disk)->delete($file->path);
+        static::forceDeleting(function (ProfessionalFile $arquivo): void {
+            Storage::disk($arquivo->disk)->delete($arquivo->path);
         });
     }
 

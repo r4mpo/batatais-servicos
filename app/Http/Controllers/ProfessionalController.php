@@ -18,8 +18,8 @@ class ProfessionalController extends Controller
     /**
      * Exibe a grade paginada de profissionais conforme filtros do {@see Request}.
      */
-    public function index(Request $request): View
+    public function index(Request $requisicao): View
     {
-        return view('professionals.index', $this->listingService->buildListing($request));
+        return view('professionals.index', $this->listingService->montarListagem($requisicao));
     }
 }

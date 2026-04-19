@@ -22,25 +22,25 @@ class EnsureProfessionalRegistrationComplete
     /**
      * Redireciona para o setup quando falta cadastro; libera rotas do próprio setup e demais perfis sem alteração.
      *
-     * @param  Closure(Request): Response  $next  Próximo middleware/controller na pilha.
+     * @param  Closure(Request): Response  $proximo  Próximo middleware/controller na pilha.
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $requisicao, Closure $proximo): Response
     {
-        $user = $request->user();
-        if (! $user instanceof User) {
-            return $next($request);
+        $usuario = $requisicao->user();
+        if (! $usuario instanceof User) {
+            return $proximo($requisicao);
         }
 
-        if (! $user->isProfessional()) {
-            return $next($request);
+        if (! $usuario->isProfessional()) {
+            return $proximo($requisicao);
         }
 
-        if ($this->professionalRepository->existsForUserId($user->id)) {
-            return $next($request);
+        if ($this->professionalRepository->existsForUserId($usuario->id)) {
+            return $proximo($requisicao);
         }
 
-        if ($request->routeIs('professional.setup', 'professional.setup.store')) {
-            return $next($request);
+        if ($requisicao->routeIs('professional.setup', 'professional.setup.store')) {
+            return $proximo($requisicao);
         }
 
         return redirect()->route('professional.setup');

@@ -6,7 +6,7 @@ use App\Repositories\ProfessionRepository;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
- * Fornece as profissões exibidas na seção de categorias da página inicial.
+ * Camada de serviço da home: profissões exibidas na seção de categorias.
  */
 class HomeProfessionalCategoriesService
 {
@@ -15,12 +15,13 @@ class HomeProfessionalCategoriesService
     ) {}
 
     /**
-     * Coleção de profissões marcadas para a home, via {@see ProfessionRepository::getHomepageProfessions()}.
+     * Passo a passo:
+     * 1. Delegar ao repositório a leitura de `professions` com `show_on_homepage`.
      *
      * @return Collection<int, \App\Models\Profession>
      */
-    public function getHomepageProfessions(): Collection
+    public function obterProfissoesDaPaginaInicial(): Collection
     {
-        return $this->professionsRepository->getHomepageProfessions();
+        return $this->professionsRepository->obterProfissoesDaPaginaInicial();
     }
 }

@@ -230,11 +230,13 @@
     @push('scripts')
         <script>
             (function () {
-                document.querySelectorAll('form[data-confirm]').forEach(function (form) {
-                    form.addEventListener('submit', function (e) {
-                        var msg = form.getAttribute('data-confirm');
-                        if (msg && !window.confirm(msg)) {
-                            e.preventDefault();
+                // Passo 1: localizar formulários que exigem confirmação antes do envio.
+                // Passo 2: no submit, mostrar diálogo; se cancelar, bloquear o envio.
+                document.querySelectorAll('form[data-confirm]').forEach(function (formulario) {
+                    formulario.addEventListener('submit', function (evento) {
+                        var mensagem = formulario.getAttribute('data-confirm');
+                        if (mensagem && !window.confirm(mensagem)) {
+                            evento.preventDefault();
                         }
                     });
                 });
