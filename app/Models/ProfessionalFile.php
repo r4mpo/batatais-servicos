@@ -14,21 +14,26 @@ class ProfessionalFile extends Model
 
     public const KIND_PUBLIC_PHOTO = 'public_photo';
 
-    /** Fotos de vitrine / página pública (kind = {@see KIND_PUBLIC_PHOTO}). */
-    public const FILE_TYPE_SHOWCASE = 'showcase';
+    /**
+     * Códigos de `file_type` (3 dígitos) — alinhados à migração
+     * `2026_04_24_120000_migrate_professional_files_file_type_to_numeric_codes`.
+     * 000: foto de vitrine (galeria pública); 001: verificação legada;
+     * 002–006: documentos de verificação padrão.
+     */
+    public const FILE_TYPE_CODE_SHOWCASE = '000';
 
-    /** Documento legado sem classificação (migração). */
-    public const DOCUMENT_TYPE_OTHER = 'other';
+    /** Documento de verificação legado, sem seção ativa. */
+    public const FILE_TYPE_CODE_OTHER = '001';
 
-    public const DOCUMENT_TYPE_RG = 'rg';
+    public const FILE_TYPE_CODE_RG = '002';
 
-    public const DOCUMENT_TYPE_CPF = 'cpf';
+    public const FILE_TYPE_CODE_CPF = '003';
 
-    public const DOCUMENT_TYPE_CERTIFICATE = 'certificate';
+    public const FILE_TYPE_CODE_CERTIFICATE = '004';
 
-    public const DOCUMENT_TYPE_DIPLOMA = 'diploma';
+    public const FILE_TYPE_CODE_DIPLOMA = '005';
 
-    public const DOCUMENT_TYPE_CNH = 'cnh';
+    public const FILE_TYPE_CODE_CNH = '006';
 
     protected $fillable = [
         'professional_id',
@@ -63,19 +68,36 @@ class ProfessionalFile extends Model
     }
 
     /**
-     * Tipos de documento de verificação que o profissional pode enviar em seções separadas.
+     * Tipos de documento de verificação (códigos) com seção em tela, na ordem de exibição.
      *
      * @return list<string>
      */
     public static function verificationDocumentTypes(): array
     {
         return [
-            self::DOCUMENT_TYPE_RG,
-            self::DOCUMENT_TYPE_CPF,
-            self::DOCUMENT_TYPE_CERTIFICATE,
-            self::DOCUMENT_TYPE_DIPLOMA,
-            self::DOCUMENT_TYPE_CNH,
+            self::FILE_TYPE_CODE_RG,
+            self::FILE_TYPE_CODE_CPF,
+            self::FILE_TYPE_CODE_CERTIFICATE,
+            self::FILE_TYPE_CODE_DIPLOMA,
+            self::FILE_TYPE_CODE_CNH,
         ];
+    }
+
+    /**
+     * Sufixo de chave em `labels` (`professional_files_doc_{sufixo}`) para o código dado
+     * (seções de documento de verificação e bloco "outros"; default evita título vazio se surgir dado inesperado).
+     */
+    public static function fileTypeToTranslationKey(string $code): string
+    {
+        return match ($code) {
+            self::FILE_TYPE_CODE_RG => 'rg',
+            self::FILE_TYPE_CODE_CPF => 'cpf',
+            self::FILE_TYPE_CODE_CERTIFICATE => 'certificate',
+            self::FILE_TYPE_CODE_DIPLOMA => 'diploma',
+            self::FILE_TYPE_CODE_CNH => 'cnh',
+            self::FILE_TYPE_CODE_OTHER => 'other',
+            default => 'other',
+        };
     }
 
     public function isVerificationDocument(): bool
@@ -91,6 +113,6 @@ class ProfessionalFile extends Model
     public function isShowcasePhoto(): bool
     {
         return $this->kind === self::KIND_PUBLIC_PHOTO
-            && ($this->file_type === self::FILE_TYPE_SHOWCASE || $this->file_type === null);
+            && ($this->file_type === null || $this->file_type === self::FILE_TYPE_CODE_SHOWCASE);
     }
 }

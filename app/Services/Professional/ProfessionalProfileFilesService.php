@@ -160,7 +160,7 @@ class ProfessionalProfileFilesService
             ProfessionalFile::query()->create([
                 'professional_id' => $profissional->id,
                 'kind' => ProfessionalFile::KIND_PUBLIC_PHOTO,
-                'file_type' => ProfessionalFile::FILE_TYPE_SHOWCASE,
+                'file_type' => ProfessionalFile::FILE_TYPE_CODE_SHOWCASE,
                 'disk' => 'public',
                 'path' => $caminhoArmazenado,
                 'original_name' => $arquivo->getClientOriginalName(),

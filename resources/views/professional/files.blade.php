@@ -1,7 +1,7 @@
 @php
     /** @var \App\Models\Professional $professional */
     $verificationFiles = $professional->profileFiles->where('kind', \App\Models\ProfessionalFile::KIND_VERIFICATION_DOCUMENT);
-    $otherVerificationFiles = $verificationFiles->where('file_type', \App\Models\ProfessionalFile::DOCUMENT_TYPE_OTHER);
+    $otherVerificationFiles = $verificationFiles->where('file_type', \App\Models\ProfessionalFile::FILE_TYPE_CODE_OTHER);
     $publicFiles = $professional->profileFiles->filter(
         fn ($f) => $f->isPublicPhoto() && $f->isShowcasePhoto()
     );
@@ -113,7 +113,7 @@
                     @endphp
                     <div class="professional-files-doc-section border rounded-3 p-3 mb-3 bg-body-secondary bg-opacity-25" id="doc-{{ $docType }}">
                         <h3 class="h6 fw-semibold mb-2">
-                            {{ __('labels.professional_files_doc_'.$docType) }}
+                            {{ __('labels.professional_files_doc_'.\App\Models\ProfessionalFile::fileTypeToTranslationKey($docType)) }}
                         </h3>
                         <p class="text-muted small mb-3">{{ __('labels.professional_files_doc_section_hint') }}</p>
 
@@ -158,7 +158,7 @@
                 @endforeach
 
                 @if ($otherVerificationFiles->isNotEmpty())
-                    <div class="professional-files-doc-section border rounded-3 p-3 mb-0 bg-light" id="doc-other">
+                    <div class="professional-files-doc-section border rounded-3 p-3 mb-0 bg-light" id="doc-{{ \App\Models\ProfessionalFile::FILE_TYPE_CODE_OTHER }}">
                         <h3 class="h6 fw-semibold mb-2">{{ __('labels.professional_files_doc_other') }}</h3>
                         <p class="text-muted small mb-3">{{ __('labels.professional_files_doc_other_hint') }}</p>
                         <div class="row g-3">
