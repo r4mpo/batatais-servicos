@@ -562,6 +562,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'professional_verificacao_voltar' => 'Voltar ao painel',
     'professional_verificacao_sucesso' => 'Solicitação registrada em fila. A equipe conduzirá a análise (fluxo a ser finalizado).',
     'professional_verificacao_pendente' => 'Já existe uma solicitação aguardando análise. Aguarde a decisão antes de enviar outro pedido.',
+    'professional_verificacao_ja_aprovada' => 'Sua verificação já foi aprovada. Não é possível abrir um novo pedido; o selo permanece enquanto o cadastro estiver ativo e conforme as regras da plataforma.',
     'professional_verificacao_cadastro' => 'Cadastro profissional',
     'professional_verificacao_cadastro_sub' => 'Categoria, RG, CPF, título, descrição e valor por hora',
     'professional_verificacao_arquivos' => 'Foto de perfil e documentos',
@@ -614,6 +615,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'verificacao_checklist_tudo_pronto' => 'Pré-checagem: nenhum requisito faltando no cadastro. Você pode enviar a solicitação.',
     'verificacao_checklist_titulo' => 'O que ainda precisa (pré-checagem no servidor no envio):',
     'verificacao_form_bloqueado' => 'Envio bloqueado: já existe um pedido em análise.',
+    'verificacao_form_bloqueado_ja_aprovada' => 'Novo envio desativado: verificação já aprovada.',
 
     'verificacao_selo_aria' => 'Profissional com verificacao aprovada',
 

@@ -203,6 +203,7 @@ return [
     'professional_verificacao_voltar' => 'Back to dashboard',
     'professional_verificacao_sucesso' => 'Request added to the queue. Review will follow the upcoming workflow.',
     'professional_verificacao_pendente' => 'You already have a request under review. Wait for a decision before sending another one.',
+    'professional_verificacao_ja_aprovada' => 'Your profile is already verified. You cannot submit a new request while your approved verification is active under the platform rules.',
     'professional_verificacao_cadastro' => 'Professional profile',
     'professional_verificacao_cadastro_sub' => 'Category, ID, CPF, title, description, hourly rate',
     'professional_verificacao_arquivos' => 'Profile photo and documents',
@@ -235,7 +236,7 @@ return [
     'verificacao_historico_momento_aprovacao' => 'Approved on :quando',
     'verificacao_historico_momento_reprovacao' => 'Not approved on :quando',
     'verificacao_historico_data_hora' => 'at :hora',
-    
+
     'verificacao_modal_titulo' => 'Verification request details',
     'verificacao_modal_ajuda' => 'After the review, this will show the decision time, responsible user, and notes.',
     'verificacao_modal_campo_id' => 'Request number',
@@ -255,6 +256,7 @@ return [
     'verificacao_checklist_tudo_pronto' => 'Prerequisite check: nothing missing. You can submit the request.',
     'verificacao_checklist_titulo' => 'Current gaps (re-validated on submit):',
     'verificacao_form_bloqueado' => 'Submit is disabled: a request is already under review.',
+    'verificacao_form_bloqueado_ja_aprovada' => 'Submit is disabled: your profile is already verified.',
     'verificacao_selo_aria' => 'Professionally verified',
 
     'dashboard_card_password_title' => 'Account security',

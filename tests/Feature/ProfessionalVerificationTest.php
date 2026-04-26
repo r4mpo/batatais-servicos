@@ -109,4 +109,30 @@ class ProfessionalVerificationTest extends TestCase
             ->assertRedirect(route('professional.verificacao'))
             ->assertSessionHas('requisitos_verificacao_faltando');
     }
+
+    public function test_submissao_apos_aprovacao_nao_registra_nova_solicitacao(): void
+    {
+        $dados = $this->criarDadosCompletosParaVerificacao();
+        $u = $dados['usuario'];
+
+        ProfessionalVerificationRequest::query()->create([
+            'user_id' => $u->id,
+            'decided_by_user_id' => null,
+            'decided_at' => now(),
+            'approved' => true,
+            'notes' => null,
+        ]);
+
+        $this->actingAs($u)
+            ->post(route('professional.verificacao.store'), [
+                'confirmo_termos' => '1',
+            ])
+            ->assertRedirect(route('professional.verificacao'))
+            ->assertSessionHas('status', 'professional-verification-already-approved');
+
+        $this->assertSame(
+            1,
+            ProfessionalVerificationRequest::query()->where('user_id', $u->id)->count()
+        );
+    }
 }

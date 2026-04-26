@@ -122,14 +122,14 @@ class ProfessionalVerificationService
     }
 
     /**
-     * Tenta gravar uma nova solicitação em análise, exceto se já houver pendência ou faltar requisito.
+     * Tenta gravar uma nova solicitação em análise, exceto se já houver aprovação, pendência ou faltar requisito.
      *
-     * @return array{ok: bool, faltas: list<string>, pendente: bool, criada: ?ProfessionalVerificationRequest}
+     * @return array{ok: bool, faltas: list<string>, pendente: bool, jaAprovada: bool, criada: ?ProfessionalVerificationRequest}
      */
     public function tentarRegistrarSolicitacao(User $usuario): array
     {
         if (! $usuario->isProfessional()) {
-            return ['ok' => false, 'faltas' => [], 'pendente' => false, 'criada' => null];
+            return ['ok' => false, 'faltas' => [], 'pendente' => false, 'jaAprovada' => false, 'criada' => null];
         }
 
         $profissional = $this->repositorioProfissional->findFirstForUserId($usuario->id);
@@ -138,6 +138,17 @@ class ProfessionalVerificationService
                 'ok' => false,
                 'faltas' => [self::CHAVE_REQUISITO_PROFISSAO],
                 'pendente' => false,
+                'jaAprovada' => false,
+                'criada' => null,
+            ];
+        }
+
+        if ($this->repositorioSolicitacoes->possuiAprovadaParaUserId($usuario->id)) {
+            return [
+                'ok' => false,
+                'faltas' => [],
+                'pendente' => false,
+                'jaAprovada' => true,
                 'criada' => null,
             ];
         }
@@ -147,13 +158,20 @@ class ProfessionalVerificationService
                 'ok' => false,
                 'faltas' => [],
                 'pendente' => true,
+                'jaAprovada' => false,
                 'criada' => null,
             ];
         }
 
         $faltas = $this->requisitosFaltando($this->garantirProfissaoELegivel($profissional));
         if ($faltas !== []) {
-            return ['ok' => false, 'faltas' => $faltas, 'pendente' => false, 'criada' => null];
+            return [
+                'ok' => false,
+                'faltas' => $faltas,
+                'pendente' => false,
+                'jaAprovada' => false,
+                'criada' => null,
+            ];
         }
 
         $criada = $this->repositorioSolicitacoes->inserirPendente($usuario->id);
@@ -162,6 +180,7 @@ class ProfessionalVerificationService
             'ok' => true,
             'faltas' => [],
             'pendente' => false,
+            'jaAprovada' => false,
             'criada' => $criada,
         ];
     }
@@ -186,6 +205,11 @@ class ProfessionalVerificationService
     public function chaveMensagemFlashPendente(): string
     {
         return 'professional-verification-pending-exists';
+    }
+
+    public function chaveMensagemFlashJaAprovada(): string
+    {
+        return 'professional-verification-already-approved';
     }
 
     private function possuiArquivoDeVerificacao(Professional $profissional, string $codigoTipo): bool

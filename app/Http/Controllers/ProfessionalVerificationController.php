@@ -68,6 +68,11 @@ class ProfessionalVerificationController extends Controller
                 ->route('professional.verificacao')
                 ->with('status', $this->servicoVerificacao->chaveMensagemFlashPendente());
         }
+        if (! empty($resultado['jaAprovada'])) {
+            return redirect()
+                ->route('professional.verificacao')
+                ->with('status', $this->servicoVerificacao->chaveMensagemFlashJaAprovada());
+        }
 
         return redirect()
             ->route('professional.verificacao')

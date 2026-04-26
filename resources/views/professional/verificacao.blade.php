@@ -3,6 +3,8 @@
 
     $statusSucesso = 'professional-verification-request-submitted';
     $statusPendenteFila = 'professional-verification-pending-exists';
+    $statusJaAprovada = 'professional-verification-already-approved';
+    $envioBloqueado = ($possuiSolicitacaoPendente ?? false) || ($possuiVerificacaoAprovada ?? false);
     $faltasDaSessao = session('requisitos_verificacao_faltando', []);
     if (!is_array($faltasDaSessao)) {
         $faltasDaSessao = [];
@@ -47,6 +49,13 @@
         @if (session('status') && session('status') === $statusPendenteFila)
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 {{ __('labels.professional_verificacao_pendente') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                    aria-label="{{ __('labels.dashboard_alert_dismiss') }}"></button>
+            </div>
+        @endif
+        @if (session('status') && session('status') === $statusJaAprovada)
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ __('labels.professional_verificacao_ja_aprovada') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"
                     aria-label="{{ __('labels.dashboard_alert_dismiss') }}"></button>
             </div>
@@ -112,45 +121,50 @@
             </div>
         </div>
 
-        @if ($faltasAgora === [])
-            <p class="alert alert-light border small" role="status">
-                <i class="fas fa-clipboard-check text-success me-1" aria-hidden="true"></i>
-                {{ __('labels.verificacao_checklist_tudo_pronto') }}
-            </p>
-        @else
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body p-4 small">
-                    <h2 class="h6 fw-bold text-danger">{{ __('labels.verificacao_checklist_titulo') }}</h2>
-                    <ul class="ps-3 mb-0 text-muted">
-                        @foreach ($faltasAgora as $falta)
-                            <li>
-                                @if ($falta === ProfessionalVerificationService::CHAVE_REQUISITO_DESCRICAO)
-                                    {{ __('labels.verificacao_falta_requisito_descricao', [
-                                        'min' => ProfessionalVerificationService::TAMANHO_MINIMO_DESCRICAO,
-                                    ]) }}
-                                @else
-                                    {{ __('labels.verificacao_falta_' . $falta) }}
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
+        @if (! ($possuiVerificacaoAprovada ?? false))
+            @if ($faltasAgora === [])
+                <p class="alert alert-light border small" role="status">
+                    <i class="fas fa-clipboard-check text-success me-1" aria-hidden="true"></i>
+                    {{ __('labels.verificacao_checklist_tudo_pronto') }}
+                </p>
+            @else
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body p-4 small">
+                        <h2 class="h6 fw-bold text-danger">{{ __('labels.verificacao_checklist_titulo') }}</h2>
+                        <ul class="ps-3 mb-0 text-muted">
+                            @foreach ($faltasAgora as $falta)
+                                <li>
+                                    @if ($falta === ProfessionalVerificationService::CHAVE_REQUISITO_DESCRICAO)
+                                        {{ __('labels.verificacao_falta_requisito_descricao', [
+                                            'min' => ProfessionalVerificationService::TAMANHO_MINIMO_DESCRICAO,
+                                        ]) }}
+                                    @else
+                                        {{ __('labels.verificacao_falta_' . $falta) }}
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            @endif
         @endif
 
         <form method="post" action="{{ route('professional.verificacao.store') }}"
             class="verificacao-form card border-0 shadow-sm mb-4">
             @csrf
             <div class="card-body p-4 p-md-5">
-                @if ($possuiSolicitacaoPendente)
+                @if ($possuiVerificacaoAprovada ?? false)
+                    <p class="text-primary small mb-4 d-flex align-items-center gap-2">
+                        <i class="fas fa-award" aria-hidden="true"></i>{{ __('labels.verificacao_form_bloqueado_ja_aprovada') }}
+                    </p>
+                @elseif ($possuiSolicitacaoPendente)
                     <p class="text-warning small mb-4 d-flex align-items-center gap-2">
-                        <i class="fas fa-pause-circle"
-                            aria-hidden="true"></i>{{ __('labels.verificacao_form_bloqueado') }}
+                        <i class="fas fa-pause-circle" aria-hidden="true"></i>{{ __('labels.verificacao_form_bloqueado') }}
                     </p>
                 @endif
                 <div class="form-check verificacao-form__check">
                     <input class="form-check-input @error('confirmo_termos') is-invalid @enderror" type="checkbox"
-                        name="confirmo_termos" value="1" id="confirmo_termos" @disabled($possuiSolicitacaoPendente)>
+                        name="confirmo_termos" value="1" id="confirmo_termos" @disabled($envioBloqueado)>
                     <label class="form-check-label small text-body-secondary" for="confirmo_termos">
                         {{ __('labels.professional_verificacao_ciente_label') }}
                     </label>
@@ -163,7 +177,7 @@
                     @enderror
                 </div>
                 <div class="d-grid d-sm-block mt-4">
-                    <button type="submit" class="btn btn-success btn-lg px-4" @disabled($possuiSolicitacaoPendente)>
+                    <button type="submit" class="btn btn-success btn-lg px-4" @disabled($envioBloqueado)>
                         <i class="fas fa-paper-plane me-2"
                             aria-hidden="true"></i>{{ __('labels.professional_verificacao_btn_enviar') }}
                     </button>
