@@ -150,7 +150,7 @@
                                 <p class="text-muted small mb-0">{{ __('labels.dashboard_card_password_text') }}</p>
                             </div>
                             <div class="card-footer bg-transparent border-top pt-3">
-                                <a href="{{ route('profile.edit') }}#dashboard-anchor-password"
+                                <a href="{{ route('profile.edit') }}"
                                     class="btn btn-outline-danger dashboard-action-btn w-100">
                                     {{ __('labels.dashboard_card_password_btn') }}
                                 </a>

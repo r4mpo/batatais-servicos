@@ -1,27 +1,31 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+    @endpush
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
+    <div class="py-4 profile-page">
+        <div class="container-fluid px-0 px-sm-3" style="max-width: 1200px; margin: 0 auto;">
+            <div class="row g-4 align-items-start">
+                <div class="col-12 col-lg-7">
+                    <div class="card border-0 shadow-sm profile-section-card mb-4">
+                        <div class="card-body p-4 p-lg-5">
+                            @include('profile.partials.update-profile-information-form')
+                        </div>
+                    </div>
+
+                    <div id="dashboard-anchor-password" class="card border-0 shadow-sm profile-section-card" tabindex="-1">
+                        <div class="card-body p-4 p-lg-5">
+                            @include('profile.partials.update-password-form')
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div id="dashboard-anchor-password" class="p-4 sm:p-8 bg-white shadow sm:rounded-lg" tabindex="-1">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
+                <div class="col-12 col-lg-5">
+                    <div class="card border-0 shadow-sm profile-section-card profile-delete-card">
+                        <div class="card-body p-4 p-lg-5">
+                            @include('profile.partials.delete-user-form')
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
