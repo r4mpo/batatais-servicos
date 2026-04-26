@@ -38,6 +38,7 @@ class ProfessionalRepository
     ): LengthAwarePaginator {
         $query = Professional::query()
             ->with(['user', 'profession'])
+            ->withExists('solicitacoesVerificacaoAprovadas')
             ->withAvg('reviews', 'rating')
             ->withCount('reviews');
 

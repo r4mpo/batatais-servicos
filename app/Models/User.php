@@ -68,6 +68,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Fila e histórico de solicitações de verificação (conta de profissional = este usuário).
+     */
+    public function solicitacoesVerificacaoProfissional(): HasMany
+    {
+        return $this->hasMany(ProfessionalVerificationRequest::class, 'user_id');
+    }
+
+    /**
      * Avaliações que este usuário deixou em perfis de profissionais.
      */
     public function professionalReviews(): HasMany

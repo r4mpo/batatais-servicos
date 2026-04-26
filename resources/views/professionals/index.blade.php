@@ -152,7 +152,12 @@
                                         @endif
                                     </div>
                                     <div class="professional-body">
-                                        <div class="professional-name">{{ $professional->user->name }}</div>
+                                        <div class="professional-name d-flex align-items-center flex-wrap gap-1">
+                                            <span>{{ $professional->user->name }}</span>
+                                            @if (! empty($professional->solicitacoes_verificacao_aprovadas_exists))
+                                                <i class="fas fa-check-circle text-primary" title="{{ __('labels.verificacao_selo_aria') }}" aria-label="{{ __('labels.verificacao_selo_aria') }}"></i>
+                                            @endif
+                                        </div>
                                         <div class="professional-category">{{ $professional->profession->title }}</div>
                                         <div class="professional-rating">
                                             <div class="stars" aria-label="{{ __('labels.professionals_rating_stars_label', ['n' => $mediaEstrelas]) }}">

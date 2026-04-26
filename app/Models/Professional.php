@@ -53,4 +53,13 @@ class Professional extends Model
     {
         return $this->hasMany(ProfessionalFile::class);
     }
+
+    /**
+     * Usada na listagem pública para o selo: ao menos uma solicitação aprovada para o usuário do profissional.
+     */
+    public function solicitacoesVerificacaoAprovadas(): HasMany
+    {
+        return $this->hasMany(ProfessionalVerificationRequest::class, 'user_id', 'user_id')
+            ->where('approved', true);
+    }
 }

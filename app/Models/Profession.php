@@ -19,6 +19,9 @@ class Profession extends Model
         'icon',
         'show_on_homepage',
         'is_global_listing',
+        'verificacao_exige_cnh',
+        'verificacao_exige_certificado',
+        'verificacao_exige_diploma',
     ];
 
     protected function casts(): array
@@ -26,6 +29,9 @@ class Profession extends Model
         return [
             'show_on_homepage' => 'boolean',
             'is_global_listing' => 'boolean',
+            'verificacao_exige_cnh' => 'boolean',
+            'verificacao_exige_certificado' => 'boolean',
+            'verificacao_exige_diploma' => 'boolean',
         ];
     }
 

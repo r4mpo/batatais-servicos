@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProfessionalOnboardingController;
 use App\Http\Controllers\ProfessionalProfileFilesController;
+use App\Http\Controllers\ProfessionalVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilePhotoController;
 use App\Http\Middleware\EnsureProfessionalRegistrationComplete;
@@ -32,6 +33,9 @@ Route::middleware(['auth', 'verified', EnsureProfessionalRegistrationComplete::c
     Route::get('/area-profissional/arquivos/documentos-verificacao/{professional_file}', [ProfessionalProfileFilesController::class, 'exibirDocumentoVerificacao'])->name('professional.files.verification.show');
     Route::post('/area-profissional/arquivos/fotos-publicas', [ProfessionalProfileFilesController::class, 'armazenarFotosPublicas'])->name('professional.files.public');
     Route::delete('/area-profissional/arquivos/arquivo/{professional_file}', [ProfessionalProfileFilesController::class, 'excluirArquivo'])->name('professional.files.destroy');
+
+    Route::get('/area-profissional/verificacao', [ProfessionalVerificationController::class, 'exibirFormulario'])->name('professional.verificacao');
+    Route::post('/area-profissional/verificacao', [ProfessionalVerificationController::class, 'armazenar'])->name('professional.verificacao.store');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

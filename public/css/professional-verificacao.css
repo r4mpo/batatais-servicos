@@ -1,0 +1,102 @@
+/**
+ * Tela: área do profissional / verificação
+ */
+.verificacao-page {
+    padding-bottom: 1.5rem;
+}
+
+.verificacao-page .verificacao-acesso {
+    border-radius: 0.85rem;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background: var(--bs-body-bg);
+}
+
+.verificacao-page .verificacao-acesso:hover,
+.verificacao-page .verificacao-acesso:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 0.65rem 1.35rem rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(13, 110, 253, 0.22);
+}
+
+.verificacao-page .verificacao-acesso:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+}
+
+.verificacao-page .verificacao-acesso__icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.6rem;
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.verificacao-page .verificacao-acesso--arquivos .verificacao-acesso__icon {
+    background: rgba(13, 202, 240, 0.12);
+}
+
+.verificacao-page .verificacao-destaque-custo {
+    border-left: 4px solid var(--bs-primary);
+    background: linear-gradient(90deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.02) 100%);
+    border-radius: 0.75rem;
+}
+
+/* Checkbox em fundo suave; erro fica claramente separado do envio */
+.verificacao-page .verificacao-form__check {
+    padding: 0.65rem 0.9rem;
+    border-radius: 0.5rem;
+    background: var(--bs-gray-100);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.verificacao-page .verificacao-form__erro-check:empty {
+    display: none;
+}
+
+.verificacao-page .verificacao-form__erro-check:not(:empty) {
+    margin-top: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.verificacao-page .verificacao-form .btn-lg {
+    border-radius: 0.55rem;
+}
+
+.verificacao-page .verificacao-historico-lista .verificacao-historico-item {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    border-radius: 0.4rem;
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+.verificacao-page .verificacao-historico-lista .verificacao-historico-item:hover,
+.verificacao-page .verificacao-historico-lista .verificacao-historico-item:focus-visible {
+    background: var(--bs-gray-100) !important;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+    outline: 0;
+}
+
+.verificacao-page .verificacao-historico-icone-chevron {
+    flex: 0 0 auto;
+    opacity: 0.5;
+}
+
+#vh-m-dl > dt,
+#vh-m-dl > dd {
+    border-bottom: 1px solid #dee2e6;
+    padding: 15px;
+}
+
+#vh-m-dl > dt:last-of-type,
+#vh-m-dl > dt:last-of-type + dd {
+    border-bottom: none;
+}
+#vh-m-dl dd {
+    margin-bottom: 0;
+}

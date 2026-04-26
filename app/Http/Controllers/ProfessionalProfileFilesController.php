@@ -10,6 +10,7 @@ use App\Models\ProfessionalFile;
 use App\Models\User;
 use App\Repositories\ProfessionalRepository;
 use App\Services\Professional\ProfessionalProfileFilesService;
+use App\Services\Professional\ProfessionalVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -24,6 +25,7 @@ class ProfessionalProfileFilesController extends Controller
     public function __construct(
         private readonly ProfessionalRepository $professionalRepository,
         private readonly ProfessionalProfileFilesService $filesService,
+        private readonly ProfessionalVerificationService $verificacaoService,
     ) {}
 
     public function edit(Request $request): RedirectResponse|View
@@ -49,6 +51,7 @@ class ProfessionalProfileFilesController extends Controller
 
         return view('professional.files', [
             'professional' => $profissional,
+            'possuiVerificacaoAprovada' => $this->verificacaoService->possuiVerificacaoAprovada($usuario->id),
         ]);
     }
 

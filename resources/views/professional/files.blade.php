@@ -32,7 +32,12 @@
         </div>
 
         <div class="mb-4">
-            <h1 class="h4 fw-bold mb-2">{{ __('labels.professional_files_page_title') }}</h1>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <h1 class="h4 fw-bold mb-0">{{ __('labels.professional_files_page_title') }}</h1>
+                @if (! empty($possuiVerificacaoAprovada))
+                    <i class="fas fa-check-circle text-primary" title="{{ __('labels.verificacao_selo_aria') }}" aria-label="{{ __('labels.verificacao_selo_aria') }}"></i>
+                @endif
+            </div>
             <p class="text-muted small mb-0">{{ __('labels.professional_files_intro') }}</p>
         </div>
 
