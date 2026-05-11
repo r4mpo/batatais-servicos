@@ -84,6 +84,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Serviços em que este usuário é o contratante.
+     */
+    public function contractedServices(): HasMany
+    {
+        return $this->hasMany(Service::class, 'contractor_user_id');
+    }
+
+    /**
+     * Serviços em que este usuário é o profissional (proposta recebida).
+     */
+    public function professionalServices(): HasMany
+    {
+        return $this->hasMany(Service::class, 'professional_user_id');
+    }
+
+    /**
      * Indica se o campo `profile` corresponde ao código de usuário prestador de serviços.
      */
     public function isProfessional(): bool

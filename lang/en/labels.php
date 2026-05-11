@@ -121,7 +121,7 @@ return [
 
     'dashboard_professional_lead' => 'Professional hub: manage your listing, review indicators, and get ready for upcoming platform features.',
     'dashboard_finance_title' => 'Financial summary',
-    'dashboard_finance_disclaimer' => 'Sample figures — your real earnings and withdrawals will appear here soon.',
+    'dashboard_finance_disclaimer' => 'Based on completed services: available to withdraw is gross; net applies a 10% platform fee.',
     'dashboard_finance_available_withdrawal' => 'Available to withdraw',
     'dashboard_finance_net_available' => 'Net available',
     'dashboard_finance_total_withdrawn' => 'Total withdrawn',
@@ -144,8 +144,36 @@ return [
     'dashboard_card_messages_btn' => 'View messages',
 
     'dashboard_card_history_title' => 'Service history',
-    'dashboard_card_history_text' => 'Coming soon: list of services completed through the platform.',
+    'dashboard_card_history_text' => 'View amount, status, client, feedback, and dates for services on your account.',
     'dashboard_card_history_btn' => 'View history',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Services (history and status)
+    |--------------------------------------------------------------------------
+    */
+
+    'service_status_payment_pending' => 'Payment pending',
+    'service_status_under_review' => 'Under review',
+    'service_status_accepted' => 'Accepted by professional',
+    'service_status_in_progress' => 'Service in progress',
+    'service_status_maintenance' => 'Maintenance',
+    'service_status_support' => 'Support',
+    'service_status_concluded' => 'Completed',
+
+    'service_history_title' => 'Service history',
+    'service_history_lead' => 'Services where you are the hired professional.',
+    'service_history_back_dashboard' => 'Back to dashboard',
+    'service_history_contractor' => 'Client',
+    'service_history_value' => 'Service amount',
+    'service_history_date' => 'Registered on',
+    'service_history_updated' => 'Last updated',
+    'service_history_feedback_contractor' => 'Client feedback',
+    'service_history_feedback_professional' => 'Your feedback',
+    'service_history_withdrawn_yes' => 'Amount already withdrawn',
+    'service_history_withdrawn_pending' => 'Available for withdrawal after completion',
+    'service_history_empty_title' => 'No services yet',
+    'service_history_empty_text' => 'When bookings go through the platform, they will appear here with status, amounts, and comments.',
 
     'dashboard_card_files_title' => 'Profile files',
     'dashboard_card_files_text' => 'Photo for the public directory, documents for verification, and showcase photos.',

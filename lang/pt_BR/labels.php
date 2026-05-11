@@ -480,7 +480,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     'dashboard_professional_lead' => 'Central do profissional: gerencie seu cadastro, acompanhe indicadores e prepare-se para novas funções da plataforma.',
     'dashboard_finance_title' => 'Resumo financeiro',
-    'dashboard_finance_disclaimer' => 'Valores ilustrativos — em breve você verá aqui seus ganhos e saques reais.',
+    'dashboard_finance_disclaimer' => 'Valores com base nos seus serviços concluídos: disponível para saque usa o valor bruto; líquido aplica 10% de taxa da plataforma.',
     'dashboard_finance_available_withdrawal' => 'Disponível para saque',
     'dashboard_finance_net_available' => 'Líquido disponível',
     'dashboard_finance_total_withdrawn' => 'Total sacado',
@@ -503,8 +503,36 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'dashboard_card_messages_btn' => 'Ver mensagens',
 
     'dashboard_card_history_title' => 'Histórico de serviços',
-    'dashboard_card_history_text' => 'Em breve: lista dos serviços realizados e contratados pela plataforma.',
+    'dashboard_card_history_text' => 'Veja valor, status, contratante, feedbacks e datas dos serviços vinculados à sua conta.',
     'dashboard_card_history_btn' => 'Ver histórico',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Serviços (histórico e status)
+    |--------------------------------------------------------------------------
+    */
+
+    'service_status_payment_pending' => 'Pagamento pendente',
+    'service_status_under_review' => 'Em análise',
+    'service_status_accepted' => 'Aceito pelo profissional',
+    'service_status_in_progress' => 'Em fase de prestação de serviço',
+    'service_status_maintenance' => 'Manutenção',
+    'service_status_support' => 'Suporte',
+    'service_status_concluded' => 'Concluído',
+
+    'service_history_title' => 'Histórico de serviços',
+    'service_history_lead' => 'Serviços em que você é o profissional contratado.',
+    'service_history_back_dashboard' => 'Voltar ao painel',
+    'service_history_contractor' => 'Contratante',
+    'service_history_value' => 'Valor do serviço',
+    'service_history_date' => 'Registrado em',
+    'service_history_updated' => 'Última atualização',
+    'service_history_feedback_contractor' => 'Feedback do contratante',
+    'service_history_feedback_professional' => 'Seu feedback',
+    'service_history_withdrawn_yes' => 'Valor já sacado',
+    'service_history_withdrawn_pending' => 'Disponível para saque após conclusão',
+    'service_history_empty_title' => 'Nenhum serviço ainda',
+    'service_history_empty_text' => 'Quando houver contratações pela plataforma, elas aparecerão aqui com status, valores e comentários.',
 
     'dashboard_card_files_title' => 'Arquivos do perfil',
     'dashboard_card_files_text' => 'Foto para o diretório público, documentos para verificação e fotos da sua vitrine.',

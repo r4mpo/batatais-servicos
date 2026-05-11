@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             PracticeAreaSeeder::class,
             ProfessionSeeder::class,
             ProfessionalDemoSeeder::class,
+            ServiceDemoSeeder::class,
         ]);
     }
 }

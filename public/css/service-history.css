@@ -1,0 +1,71 @@
+/**
+ * Histórico de serviços (profissional): lista em cards.
+ */
+.service-history-page .letter-spacing {
+    letter-spacing: 0.06em;
+}
+
+.service-history-back:hover {
+    color: var(--bs-primary) !important;
+}
+
+.service-history-hero {
+    border-radius: 1rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a4f 55%, #40916c 100%);
+    box-shadow: 0 12px 40px rgba(30, 58, 95, 0.25);
+}
+
+.service-history-hero-inner {
+    padding: 1.5rem 1.75rem;
+}
+
+.service-history-card {
+    border-radius: 1rem !important;
+    overflow: hidden;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.service-history-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.service-history-card-top {
+    background: linear-gradient(120deg, #212529 0%, #343a40 100%);
+}
+
+.service-history-value {
+    letter-spacing: 0.02em;
+}
+
+.service-history-feedback {
+    background: rgba(13, 110, 253, 0.06);
+    border: 1px solid rgba(13, 110, 253, 0.12);
+}
+
+.service-history-feedback-pro {
+    background: rgba(25, 135, 84, 0.08);
+    border-color: rgba(25, 135, 84, 0.18);
+}
+
+.service-history-feedback-pro-label {
+    color: #146c43;
+}
+
+.service-history-empty {
+    border-radius: 1rem !important;
+}
+
+.service-history-empty-icon {
+    font-size: 2.75rem;
+    color: var(--bs-secondary);
+    opacity: 0.45;
+}
+
+.service-status-badge-support {
+    background-color: #6f42c1;
+    color: #fff;
+}

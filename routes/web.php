@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProfessionalOnboardingController;
 use App\Http\Controllers\ProfessionalProfileFilesController;
+use App\Http\Controllers\ProfessionalServiceHistoryController;
 use App\Http\Controllers\ProfessionalVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilePhotoController;
@@ -22,9 +24,10 @@ Route::middleware(['auth', 'verified', EnsureProfessionalRegistrationComplete::c
     Route::get('/area-profissional/cadastro', [ProfessionalOnboardingController::class, 'edit'])->name('professional.setup');
     Route::post('/area-profissional/cadastro', [ProfessionalOnboardingController::class, 'store'])->name('professional.setup.store');
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/area-profissional/historico-servicos', [ProfessionalServiceHistoryController::class, 'index'])
+        ->name('professional.services.history');
 
     Route::get('/area-profissional/arquivos', [ProfessionalProfileFilesController::class, 'edit'])->name('professional.files');
     Route::post('/area-profissional/arquivos/foto-perfil', [ProfessionalProfileFilesController::class, 'atualizarFotoPerfil'])->name('professional.files.profile-photo');

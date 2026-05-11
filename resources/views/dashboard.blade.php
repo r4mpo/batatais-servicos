@@ -1,3 +1,7 @@
+@php
+    use App\Support\BrazilianDocuments;
+@endphp
+
 <x-app-layout>
 
     @push('styles')
@@ -31,19 +35,23 @@
                         <div class="row g-3 text-center text-md-start">
                             <div class="col-6 col-md-3">
                                 <span class="text-muted small d-block">{{ __('labels.dashboard_finance_available_withdrawal') }}</span>
-                                <strong class="fs-5 d-block">{{ __('labels.dashboard_finance_sample_available') }}</strong>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($financeSummary['available_withdrawal_cents'] ?? 0) }}</strong>
                             </div>
                             <div class="col-6 col-md-3">
                                 <span class="text-muted small d-block">{{ __('labels.dashboard_finance_net_available') }}</span>
-                                <strong class="fs-5 d-block">{{ __('labels.dashboard_finance_sample_net_available') }}</strong>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($financeSummary['net_available_cents'] ?? 0) }}</strong>
                             </div>
                             <div class="col-6 col-md-3">
                                 <span class="text-muted small d-block">{{ __('labels.dashboard_finance_total_withdrawn') }}</span>
-                                <strong class="fs-5 d-block">{{ __('labels.dashboard_finance_sample_total_withdrawn') }}</strong>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($financeSummary['total_withdrawn_cents'] ?? 0) }}</strong>
                             </div>
                             <div class="col-6 col-md-3">
                                 <span class="text-muted small d-block">{{ __('labels.dashboard_finance_net_withdrawn') }}</span>
-                                <strong class="fs-5 d-block">{{ __('labels.dashboard_finance_sample_net_withdrawn') }}</strong>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($financeSummary['net_withdrawn_cents'] ?? 0) }}</strong>
                             </div>
                         </div>
                     </div>
@@ -114,10 +122,10 @@
                                 <p class="text-muted small mb-0">{{ __('labels.dashboard_card_history_text') }}</p>
                             </div>
                             <div class="card-footer bg-transparent border-top pt-3">
-                                <button type="button"
+                                <a href="{{ route('professional.services.history') }}"
                                     class="btn btn-outline-dark dashboard-action-btn w-100">
                                     {{ __('labels.dashboard_card_history_btn') }}
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
