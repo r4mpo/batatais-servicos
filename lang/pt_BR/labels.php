@@ -533,6 +533,11 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'service_history_withdrawn_pending' => 'Disponível para saque após conclusão',
     'service_history_empty_title' => 'Nenhum serviço ainda',
     'service_history_empty_text' => 'Quando houver contratações pela plataforma, elas aparecerão aqui com status, valores e comentários.',
+    'service_history_untitled' => 'Serviço sem título',
+    'service_history_description' => 'Descrição',
+    'service_history_schedule' => 'Período',
+    'service_history_hours' => 'Horário',
+    'service_history_address' => 'Endereço',
 
     'dashboard_card_files_title' => 'Arquivos do perfil',
     'dashboard_card_files_text' => 'Foto para o diretório público, documentos para verificação e fotos da sua vitrine.',

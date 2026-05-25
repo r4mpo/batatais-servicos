@@ -174,6 +174,11 @@ return [
     'service_history_withdrawn_pending' => 'Available for withdrawal after completion',
     'service_history_empty_title' => 'No services yet',
     'service_history_empty_text' => 'When bookings go through the platform, they will appear here with status, amounts, and comments.',
+    'service_history_untitled' => 'Untitled service',
+    'service_history_description' => 'Description',
+    'service_history_schedule' => 'Schedule',
+    'service_history_hours' => 'Hours',
+    'service_history_address' => 'Address',
 
     'dashboard_card_files_title' => 'Profile files',
     'dashboard_card_files_text' => 'Photo for the public directory, documents for verification, and showcase photos.',

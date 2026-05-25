@@ -45,13 +45,16 @@
                                 <div class="card-body p-0">
                                     <div class="service-history-card-top px-4 py-3">
                                         <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
-                                            <div>
+                                            <div class="flex-grow-1 pe-2">
                                                 <span class="text-white-50 small text-uppercase fw-semibold letter-spacing">
                                                     {{ __('labels.service_history_contractor') }}
                                                 </span>
                                                 <div class="fw-bold text-white fs-6">
                                                     {{ $service->contractor->name }}
                                                 </div>
+                                                <h2 class="h6 fw-semibold text-white mt-2 mb-0 service-history-card-title">
+                                                    {{ $service->title ?: __('labels.service_history_untitled') }}
+                                                </h2>
                                             </div>
                                             <div class="text-md-end">
                                                 <span
@@ -69,6 +72,40 @@
                                         </div>
                                     </div>
                                     <div class="px-4 py-4">
+                                        @if ($service->description)
+                                            <div class="service-history-description text-body-secondary small mb-4">
+                                                <span class="text-muted text-uppercase fw-semibold small d-block mb-1 letter-spacing">{{ __('labels.service_history_description') }}</span>
+                                                <p class="mb-0">{{ $service->description }}</p>
+                                            </div>
+                                        @endif
+
+                                        <div class="row g-4 mb-2">
+                                            @if ($service->formattedDateRange())
+                                                <div class="col-sm-6 col-lg-4">
+                                                    <span class="text-muted small d-block mb-1">
+                                                        <i class="fas fa-calendar-alt me-1" aria-hidden="true"></i>{{ __('labels.service_history_schedule') }}
+                                                    </span>
+                                                    <strong>{{ $service->formattedDateRange() }}</strong>
+                                                </div>
+                                            @endif
+                                            @if ($service->formattedTimeRange())
+                                                <div class="col-sm-6 col-lg-4">
+                                                    <span class="text-muted small d-block mb-1">
+                                                        <i class="fas fa-clock me-1" aria-hidden="true"></i>{{ __('labels.service_history_hours') }}
+                                                    </span>
+                                                    <strong>{{ $service->formattedTimeRange() }}</strong>
+                                                </div>
+                                            @endif
+                                            @if ($service->formattedAddress() !== '')
+                                                <div class="col-12 col-lg-4">
+                                                    <span class="text-muted small d-block mb-1">
+                                                        <i class="fas fa-map-marker-alt me-1" aria-hidden="true"></i>{{ __('labels.service_history_address') }}
+                                                    </span>
+                                                    <strong class="d-block service-history-address-text">{{ $service->formattedAddress() }}</strong>
+                                                </div>
+                                            @endif
+                                        </div>
+
                                         <div class="row g-4">
                                             <div class="col-sm-4">
                                                 <span class="text-muted small d-block mb-1">{{ __('labels.service_history_value') }}</span>
