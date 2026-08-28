@@ -120,15 +120,13 @@ A aplicação segue uma **arquitetura em camadas** inspirada no padrão Laravel,
 
 ### 🔐 Fluxo do profissional (simplificado)
 
-```mermaid
-flowchart LR
-    A[Registro / Login] --> B{Perfil 001?}
-    B -->|Sim| C{Cadastro em professionals?}
-    C -->|Não| D[/area-profissional/cadastro]
-    C -->|Sim| E[Dashboard]
-    E --> F[Histórico de serviços]
-    E --> G[Arquivos / Verificação]
-```
+1. **Registro / Login**
+   1. Verificar se o perfil é `001`.
+   2. Verificar se existe cadastro em `professionals`.
+      - **Não:** redirecionar para `/area-profissional/cadastro`.
+      - **Sim:** acessar o **Dashboard**.
+        - Histórico de serviços
+        - Arquivos / Verificação
 
 ### 💰 Resumo financeiro (profissional)
 
