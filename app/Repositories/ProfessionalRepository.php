@@ -38,7 +38,8 @@ class ProfessionalRepository
     ): LengthAwarePaginator {
         $query = Professional::query()
             ->with(['user', 'profession'])
-            ->withExists('solicitacoesVerificacaoAprovadas')
+            // SQL Server não aceita EXISTS(...) na lista do SELECT (withExists). O count mantém o mesmo atributo.
+            ->withCount('solicitacoesVerificacaoAprovadas as solicitacoes_verificacao_aprovadas_exists')
             ->withAvg('reviews', 'rating')
             ->withCount('reviews');
 
