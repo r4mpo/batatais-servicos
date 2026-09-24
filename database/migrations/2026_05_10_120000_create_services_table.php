@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('contractor_user_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreignId('professional_user_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('contractor_user_id')->constrained('users');
+            $table->foreignId('professional_user_id')->constrained('users');
             $table->unsignedTinyInteger('status');
             $table->unsignedBigInteger('service_value_cents');
             $table->text('contractor_feedback')->nullable();

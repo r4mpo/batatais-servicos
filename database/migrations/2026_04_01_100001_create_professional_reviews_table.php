@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('professional_reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users');
             $table->foreignId('professional_id')->constrained('professionals')->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
             $table->text('comment')->nullable();

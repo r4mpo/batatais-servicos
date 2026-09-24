@@ -102,6 +102,18 @@ class User extends Authenticatable
     /**
      * Indica se o campo `profile` corresponde ao código de usuário prestador de serviços.
      */
+    protected static function booted(): void
+    {
+        static::deleting(function (User $usuario) {
+            $usuario->professionalReviews()->delete();
+
+            ProfessionalVerificationRequest::query()
+                ->withTrashed()
+                ->where('decided_by_user_id', $usuario->id)
+                ->update(['decided_by_user_id' => null]);
+        });
+    }
+
     public function isProfessional(): bool
     {
         return $this->profile === self::PROFILE_PROFESSIONAL;

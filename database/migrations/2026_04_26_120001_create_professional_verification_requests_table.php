@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('professional_verification_requests', function (Blueprint $tabela) {
             $tabela->id();
-            $tabela->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $tabela->foreignId('decided_by_user_id')->nullable()->constrained('users')->cascadeOnUpdate()->nullOnDelete();
+            $tabela->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $tabela->foreignId('decided_by_user_id')->nullable()->constrained('users');
             $tabela->timestamp('decided_at')->nullable();
             $tabela->boolean('approved')->nullable()->comment('null=pending, 0=rejected, 1=approved');
             $tabela->text('notes')->nullable();

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('professionals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('profession_id')->constrained('professions')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('profession_id')->constrained('professions')->cascadeOnUpdate();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->unsignedInteger('hourly_rate_cents');

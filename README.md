@@ -53,7 +53,7 @@ O projeto prioriza **código legível**, convenções Laravel e separação em c
 |--------|------------|
 | Backend | **PHP 8.3**, **Laravel 12** |
 | Autenticação | **Laravel Breeze** (sessão, Blade) |
-| Banco | **SQLite** (padrão local) ou **MySQL/MariaDB** |
+| Banco | **SQLite** (padrão local), **MySQL/MariaDB** ou **SQL Server** |
 | Front (assets) | **Vite 7**, **Tailwind CSS 3**, **Alpine.js** |
 | UI pública | **Bootstrap 5**, **Font Awesome 6** |
 | Testes | **PHPUnit 11** |
@@ -96,9 +96,9 @@ A aplicação segue uma **arquitetura em camadas** inspirada no padrão Laravel,
                              │ Enums, Support    │
                              └────────┬─────────┘
                                       ▼
-                             ┌──────────────────┐
-                             │ MySQL / SQLite    │
-                             └──────────────────┘
+                             ┌─────────────────────────────┐
+                             │ SQL Server / MySQL / SQLite │
+                             └─────────────────────────────┘
 ```
 
 ### 📦 Camadas em detalhe
@@ -152,7 +152,7 @@ Antes de instalar, garanta:
 | Node.js | 18+ (recomendado 20+) |
 | npm | 9+ |
 
-Opcional: **MySQL 8+** ou **MariaDB** para ambientes que não usem SQLite.
+Opcional: **MySQL 8+**, **MariaDB** ou **SQL Server** (extensão `pdo_sqlsrv` e ODBC Driver) para ambientes que não usem SQLite.
 
 ---
 
@@ -210,6 +210,21 @@ DB_DATABASE=batatais_servicos
 DB_USERNAME=root
 DB_PASSWORD=sua_senha
 ```
+
+Exemplo para **SQL Server**:
+
+```env
+DB_CONNECTION=sqlsrv
+DB_HOST=127.0.0.1
+DB_PORT=1433
+DB_DATABASE=batatais_servicos
+DB_USERNAME=laravel
+DB_PASSWORD=sua_senha
+DB_ENCRYPT=yes
+DB_TRUST_SERVER_CERTIFICATE=false
+```
+
+`DB_ENCRYPT` aceita `yes` ou `no`. `DB_TRUST_SERVER_CERTIFICATE` aceita `true` ou `false`. Em desenvolvimento local com certificado autoassinado, use `DB_ENCRYPT=no` ou `DB_TRUST_SERVER_CERTIFICATE=true`. É necessária a extensão PHP `pdo_sqlsrv` e o ODBC Driver for SQL Server.
 
 ### 4️⃣ Rodar migrations
 
@@ -291,8 +306,8 @@ Exemplo de estrutura (padrão do projeto):
 ```php
 Schema::create('services', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('contractor_user_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
-    $table->foreignId('professional_user_id')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
+    $table->foreignId('contractor_user_id')->constrained('users');
+    $table->foreignId('professional_user_id')->constrained('users');
     $table->unsignedTinyInteger('status');
     $table->unsignedBigInteger('service_value_cents');
     $table->boolean('value_withdrawn')->default(false);
@@ -300,6 +315,16 @@ Schema::create('services', function (Blueprint $table) {
     $table->softDeletes();
 });
 ```
+
+### SQL Server
+
+As migrations rodam no SQL Server com três cuidados que o MySQL e o SQLite não exigem:
+
+- Não use `restrictOnDelete()`. O T-SQL rejeita `ON DELETE RESTRICT`. Sem essa cláusula, o padrão já é `NO ACTION`, o mesmo efeito de impedir apagar o pai enquanto existir filho.
+- Não crie dois caminhos de `CASCADE` (ou `SET NULL`) entre as mesmas tabelas. Por isso `professional_reviews.user_id` e `services` não cascateiam a partir de `users`: a avaliação é apagada junto com o profissional, e ao excluir a conta o model `User` remove as avaliações que a pessoa escreveu e zera `decided_by_user_id`.
+- `cpf` e `cnpj` podem ficar vazios em vários profissionais. No SQL Server um unique comum aceita um único `NULL`. A migration `2026_09_24_200000_use_filtered_unique_indexes_for_professional_documents_on_sqlsrv` troca esses índices por unique filtrado (`WHERE coluna IS NOT NULL`) só nesse driver.
+
+A suíte PHPUnit usa SQLite em memória (`phpunit.xml`) e não precisa do SQL Server.
 
 Aplicar:
 
@@ -439,7 +464,7 @@ php artisan config:clear --ansi
 php artisan test
 ```
 
-Testes de feature ficam em `tests/Feature/` (onboarding, autenticação, verificação, etc.).
+Testes de feature ficam em `tests/Feature/` (onboarding, autenticação, verificação, etc.). O `phpunit.xml` força SQLite em memória, mesmo quando o `.env` aponta para SQL Server.
 
 ---
 

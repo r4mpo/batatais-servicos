@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('professions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('practice_area_id')->constrained('practice_areas')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('practice_area_id')->constrained('practice_areas')->cascadeOnUpdate();
             $table->string('title');
             $table->text('description');
             $table->string('slug')->unique();

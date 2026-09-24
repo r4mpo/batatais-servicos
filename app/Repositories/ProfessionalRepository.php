@@ -131,7 +131,7 @@ class ProfessionalRepository
 
         switch ($sort) {
             case 'rating':
-                $query->orderByRaw($avgSub . ' IS NULL')
+                $query->orderByRaw('CASE WHEN ' . $avgSub . ' IS NULL THEN 1 ELSE 0 END')
                     ->orderByRaw($avgSub . ' DESC');
                 break;
             case 'price_asc':
