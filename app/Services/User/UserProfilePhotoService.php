@@ -2,10 +2,9 @@
 
 namespace App\Services\User;
 
+use App\Http\Responses\ResultadoResposta;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Regras para expor a foto de perfil sem colocar o id numérico do usuário na URL.
@@ -40,26 +39,26 @@ class UserProfilePhotoService
      * 1. Decodificar token para id; se inválido, 404.
      * 2. Buscar usuário e conferir coluna `profile_photo`.
      * 3. Verificar arquivo em `public/` + `PROFILE_PHOTO_PUBLIC_DIR`.
-     * 4. Responder com `response()->file` e cache privado curto.
+     * 4. Descrever o arquivo com cache privado curto, ou 404.
      */
-    public function entregarArquivo(string $token): BinaryFileResponse
+    public function entregarArquivo(string $token): ResultadoResposta
     {
         $idUsuario = $this->decodificarToken($token);
         if ($idUsuario === null) {
-            throw new NotFoundHttpException;
+            return ResultadoResposta::erroHttp(404);
         }
 
         $usuario = User::query()->find($idUsuario);
         if ($usuario === null || $usuario->profile_photo === null || $usuario->profile_photo === '') {
-            throw new NotFoundHttpException;
+            return ResultadoResposta::erroHttp(404);
         }
 
         $caminhoFisico = public_path(User::PROFILE_PHOTO_PUBLIC_DIR.DIRECTORY_SEPARATOR.$usuario->profile_photo);
         if (! is_file($caminhoFisico)) {
-            throw new NotFoundHttpException;
+            return ResultadoResposta::erroHttp(404);
         }
 
-        return response()->file($caminhoFisico, [
+        return ResultadoResposta::arquivo($caminhoFisico, [
             'Content-Disposition' => 'inline; filename="profile"',
             'Cache-Control' => 'private, max-age=3600',
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Services\Professional;
 
+use App\Http\Responses\ResultadoResposta;
 use App\Models\User;
 use App\Repositories\ProfessionRepository;
 use App\Repositories\ProfessionalRepository;
@@ -26,19 +27,17 @@ class ProfessionalOnboardingService
      * Passo a passo:
      * 1. Garantir usuário autenticado com perfil profissional.
      * 2. Carregar lista de profissões e o primeiro `professionals` da conta.
-     *
-     * @return array{professions: \Illuminate\Database\Eloquent\Collection, professional: \App\Models\Professional|null}|null
      */
-    public function montarModeloDaViewDeCadastro(?User $usuario): ?array
+    public function montarModeloDaViewDeCadastro(mixed $usuario): ResultadoResposta
     {
-        if ($usuario === null || ! $usuario->isProfessional()) {
-            return null;
+        if (! $usuario instanceof User || ! $usuario->isProfessional()) {
+            return ResultadoResposta::redirecionar('dashboard');
         }
 
-        return [
+        return ResultadoResposta::pagina('professional.setup', [
             'professions' => $this->professionRepository->orderedForProfessionalsFilter(),
             'professional' => $this->professionalRepository->findFirstForUserId($usuario->id),
-        ];
+        ]);
     }
 
     /**
@@ -48,11 +47,11 @@ class ProfessionalOnboardingService
      * 1. Mapear payload validado para colunas de `professionals` (inclui centavos da hora).
      * 2. Descobrir se já existe linha do usuário em `professionals`.
      * 3. Em transação: atualizar ou inserir; se veio senha, atualizar hash em `users`.
-     * 4. Retornar chave de flash conforme criação ou edição.
+     * 4. Redirecionar ao dashboard com a chave de flash de criação ou edição.
      *
      * @param  array<string, mixed>  $validado
      */
-    public function persistirAPartirDoValidado(User $usuario, array $validado): string
+    public function persistirAPartirDoValidado(User $usuario, array $validado): ResultadoResposta
     {
         $dadosProfissional = $this->mapearValidadoParaProfissional($validado);
         $existente = $this->professionalRepository->findFirstForUserId($usuario->id);
@@ -75,9 +74,12 @@ class ProfessionalOnboardingService
             }
         });
 
-        return $existente !== null
-            ? 'professional-profile-updated'
-            : 'professional-onboarding-complete';
+        return ResultadoResposta::redirecionar(
+            'dashboard',
+            status: $existente !== null
+                ? 'professional-profile-updated'
+                : 'professional-onboarding-complete',
+        );
     }
 
     /**

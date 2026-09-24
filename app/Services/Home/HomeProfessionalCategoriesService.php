@@ -2,6 +2,7 @@
 
 namespace App\Services\Home;
 
+use App\Http\Responses\ResultadoResposta;
 use App\Repositories\ProfessionRepository;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -23,5 +24,12 @@ class HomeProfessionalCategoriesService
     public function obterProfissoesDaPaginaInicial(): Collection
     {
         return $this->professionsRepository->obterProfissoesDaPaginaInicial();
+    }
+
+    public function montarPaginaInicial(): ResultadoResposta
+    {
+        return ResultadoResposta::pagina('welcome', [
+            'homepageProfessions' => $this->obterProfissoesDaPaginaInicial(),
+        ]);
     }
 }

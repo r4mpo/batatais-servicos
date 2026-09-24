@@ -2,9 +2,9 @@
 
 namespace App\Services\Professional;
 
+use App\Http\Responses\ResultadoResposta;
 use App\Models\Professional;
 use App\Models\ProfessionalFile;
-use App\Models\ProfessionalVerificationRequest;
 use App\Models\User;
 use App\Repositories\ProfessionalRepository;
 use App\Repositories\ProfessionalVerificationRequestRepository;
@@ -121,68 +121,81 @@ class ProfessionalVerificationService
         return $this->repositorioSolicitacoes->listarPorUserIdMaisRecentePrimeiro($usuario->id);
     }
 
-    /**
-     * Tenta gravar uma nova solicitação em análise, exceto se já houver aprovação, pendência ou faltar requisito.
-     *
-     * @return array{ok: bool, faltas: list<string>, pendente: bool, jaAprovada: bool, criada: ?ProfessionalVerificationRequest}
-     */
-    public function tentarRegistrarSolicitacao(User $usuario): array
+    public function montarFormulario(mixed $usuario): ResultadoResposta
     {
-        if (! $usuario->isProfessional()) {
-            return ['ok' => false, 'faltas' => [], 'pendente' => false, 'jaAprovada' => false, 'criada' => null];
+        if (! $usuario instanceof User || ! $usuario->isProfessional()) {
+            return ResultadoResposta::redirecionar('dashboard');
         }
 
         $profissional = $this->repositorioProfissional->findFirstForUserId($usuario->id);
         if ($profissional === null) {
-            return [
-                'ok' => false,
-                'faltas' => [self::CHAVE_REQUISITO_PROFISSAO],
-                'pendente' => false,
-                'jaAprovada' => false,
-                'criada' => null,
-            ];
+            return ResultadoResposta::redirecionar('professional.setup');
+        }
+
+        $profissional = $this->garantirProfissaoELegivel($profissional);
+        if ($profissional->user === null) {
+            $profissional->load('user');
+        }
+
+        return ResultadoResposta::pagina('professional.verificacao', [
+            'profissional' => $profissional,
+            'historico' => $this->listarSolicitacoes($usuario),
+            'faltasRequisito' => $this->requisitosFaltando($profissional),
+            'possuiVerificacaoAprovada' => $this->possuiVerificacaoAprovada($usuario->id),
+            'possuiSolicitacaoPendente' => $this->possuiSolicitacaoPendente($usuario->id),
+        ]);
+    }
+
+    /**
+     * Tenta gravar uma nova solicitação em análise, exceto se já houver aprovação, pendência ou faltar requisito.
+     */
+    public function tentarRegistrarSolicitacao(mixed $usuario): ResultadoResposta
+    {
+        if (! $usuario instanceof User || ! $usuario->isProfessional()) {
+            return $this->redirecionarVerificacao(faltas: []);
+        }
+
+        $profissional = $this->repositorioProfissional->findFirstForUserId($usuario->id);
+        if ($profissional === null) {
+            return $this->redirecionarVerificacao(faltas: [self::CHAVE_REQUISITO_PROFISSAO]);
         }
 
         if ($this->repositorioSolicitacoes->possuiAprovadaParaUserId($usuario->id)) {
-            return [
-                'ok' => false,
-                'faltas' => [],
-                'pendente' => false,
-                'jaAprovada' => true,
-                'criada' => null,
-            ];
+            return ResultadoResposta::redirecionar(
+                'professional.verificacao',
+                status: $this->chaveMensagemFlashJaAprovada(),
+            );
         }
 
         if ($this->repositorioSolicitacoes->possuiPendenteParaUserId($usuario->id)) {
-            return [
-                'ok' => false,
-                'faltas' => [],
-                'pendente' => true,
-                'jaAprovada' => false,
-                'criada' => null,
-            ];
+            return ResultadoResposta::redirecionar(
+                'professional.verificacao',
+                status: $this->chaveMensagemFlashPendente(),
+            );
         }
 
         $faltas = $this->requisitosFaltando($this->garantirProfissaoELegivel($profissional));
         if ($faltas !== []) {
-            return [
-                'ok' => false,
-                'faltas' => $faltas,
-                'pendente' => false,
-                'jaAprovada' => false,
-                'criada' => null,
-            ];
+            return $this->redirecionarVerificacao(faltas: $faltas);
         }
 
-        $criada = $this->repositorioSolicitacoes->inserirPendente($usuario->id);
+        $this->repositorioSolicitacoes->inserirPendente($usuario->id);
 
-        return [
-            'ok' => true,
-            'faltas' => [],
-            'pendente' => false,
-            'jaAprovada' => false,
-            'criada' => $criada,
-        ];
+        return ResultadoResposta::redirecionar(
+            'professional.verificacao',
+            status: $this->chaveMensagemFlashSucesso(),
+        );
+    }
+
+    /**
+     * @param  list<string>  $faltas
+     */
+    private function redirecionarVerificacao(array $faltas): ResultadoResposta
+    {
+        return ResultadoResposta::redirecionar(
+            'professional.verificacao',
+            sessao: ['requisitos_verificacao_faltando' => $faltas],
+        );
     }
 
     /**

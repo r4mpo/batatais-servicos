@@ -2,14 +2,13 @@
 
 namespace App\Services\Professional;
 
+use App\Http\Responses\ResultadoResposta;
 use App\Models\Professional;
 use App\Models\ProfessionalFile;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Repositories\ProfessionalRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Regras de negócio dos arquivos ligados ao cadastro profissional (exceto roteamento HTTP).
@@ -19,6 +18,11 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class ProfessionalProfileFilesService
 {
+    public function __construct(
+        private readonly ProfessionalRepository $repositorioProfissional,
+        private readonly ProfessionalVerificationService $servicoVerificacao,
+    ) {}
+
     /** Limite total de arquivos de verificação (todos os tipos). */
     public const MAX_VERIFICATION_FILES = 15;
 
@@ -182,39 +186,156 @@ class ProfessionalProfileFilesService
         $arquivo->delete();
     }
 
-    /**
-     * Monta resposta HTTP para exibir um documento de verificação (arquivo no disco privado).
-     *
-     * Passo a passo:
-     * 1. Resolver caminho absoluto com o driver da coluna `disk`.
-     * 2. Devolver `response()->file` com disposition inline.
-     */
-    public function transmitirDocumentoVerificacao(ProfessionalFile $arquivo): BinaryFileResponse
+    public function montarPagina(mixed $usuario): ResultadoResposta
     {
-        $caminhoAbsoluto = Storage::disk($arquivo->disk)->path($arquivo->path);
+        if (! $usuario instanceof User || ! $usuario->isProfessional()) {
+            return ResultadoResposta::redirecionar('dashboard');
+        }
 
-        return response()->file($caminhoAbsoluto, [
-            'Content-Disposition' => 'inline; filename="'.basename($arquivo->original_name ?: $arquivo->path).'"',
+        $profissional = $this->repositorioProfissional->findFirstForUserId($usuario->id);
+        if ($profissional === null) {
+            return ResultadoResposta::redirecionar('professional.setup');
+        }
+
+        $profissional->load([
+            'user',
+            'profileFiles' => function ($consulta) {
+                $consulta->orderBy('kind')->orderBy('file_type')->orderBy('sort_order')->orderBy('id');
+            },
+        ]);
+
+        return ResultadoResposta::pagina('professional.files', [
+            'professional' => $profissional,
+            'possuiVerificacaoAprovada' => $this->servicoVerificacao->possuiVerificacaoAprovada($usuario->id),
         ]);
     }
 
+    public function substituirFotoERedirecionar(mixed $usuario, UploadedFile $arquivo): ResultadoResposta
+    {
+        $resolvido = $this->resolverProfissional($usuario);
+        if ($resolvido instanceof ResultadoResposta || ! $usuario instanceof User) {
+            return $resolvido instanceof ResultadoResposta ? $resolvido : ResultadoResposta::erroHttp(403);
+        }
+
+        $this->substituirFotoPerfil($usuario, $arquivo);
+
+        return ResultadoResposta::redirecionar('professional.files', status: 'professional-profile-photo-updated');
+    }
+
+    public function limparFotoERedirecionar(mixed $usuario): ResultadoResposta
+    {
+        $resolvido = $this->resolverProfissional($usuario);
+        if ($resolvido instanceof ResultadoResposta || ! $usuario instanceof User) {
+            return $resolvido instanceof ResultadoResposta ? $resolvido : ResultadoResposta::erroHttp(403);
+        }
+
+        $this->limparFotoPerfil($usuario);
+
+        return ResultadoResposta::redirecionar('professional.files', status: 'professional-profile-photo-removed');
+    }
+
     /**
-     * Regra de limite: documentos de verificação (total e por tipo).
-     *
-     * Passo a passo:
-     * 1. Contar existentes (total e por `file_type`).
-     * 2. Se a soma com os novos ultrapassar o limite total, montar redirect com erro.
-     * 3. Senão, se ultrapassar o limite por tipo, idem.
-     * 4. Se estiver dentro dos limites, retornar null para o controller prosseguir.
-     *
-     * @return RedirectResponse|null
+     * @param  array<int, UploadedFile>  $documentos
      */
-    public function redirecionarSeLimitesDeVerificacaoExcedidos(
+    public function adicionarDocumentosERedirecionar(mixed $usuario, array $documentos, string $tipoDocumento): ResultadoResposta
+    {
+        $profissional = $this->resolverProfissional($usuario);
+        if ($profissional instanceof ResultadoResposta) {
+            return $profissional;
+        }
+
+        $limite = $this->limiteDeVerificacaoExcedido($profissional, $tipoDocumento, count($documentos));
+        if ($limite !== null) {
+            return $limite;
+        }
+
+        $this->adicionarDocumentosVerificacao($profissional, $documentos, $tipoDocumento);
+
+        return ResultadoResposta::redirecionar(
+            'professional.files',
+            status: 'professional-verification-documents-updated',
+            fragmento: 'doc-'.$tipoDocumento,
+        );
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $fotos
+     */
+    public function adicionarFotosPublicasERedirecionar(mixed $usuario, array $fotos): ResultadoResposta
+    {
+        $profissional = $this->resolverProfissional($usuario);
+        if ($profissional instanceof ResultadoResposta) {
+            return $profissional;
+        }
+
+        $limite = $this->limiteDeFotosPublicasExcedido($profissional, count($fotos));
+        if ($limite !== null) {
+            return $limite;
+        }
+
+        $this->adicionarFotosPublicas($profissional, $fotos);
+
+        return ResultadoResposta::redirecionar('professional.files', status: 'professional-public-photos-updated');
+    }
+
+    public function excluirArquivoERedirecionar(mixed $usuario, ProfessionalFile $arquivo): ResultadoResposta
+    {
+        $profissional = $this->resolverProfissional($usuario);
+        if ($profissional instanceof ResultadoResposta) {
+            return $profissional;
+        }
+
+        if ($arquivo->professional_id !== $profissional->id) {
+            return ResultadoResposta::erroHttp(403);
+        }
+
+        $this->excluirArquivo($arquivo);
+
+        return ResultadoResposta::redirecionar('professional.files', status: 'professional-file-removed');
+    }
+
+    public function transmitirDocumentoVerificacao(mixed $usuario, ProfessionalFile $arquivo): ResultadoResposta
+    {
+        $profissional = $this->resolverProfissional($usuario);
+        if ($profissional instanceof ResultadoResposta) {
+            return $profissional;
+        }
+
+        if ($arquivo->professional_id !== $profissional->id) {
+            return ResultadoResposta::erroHttp(403);
+        }
+
+        if (! $arquivo->isVerificationDocument()) {
+            return ResultadoResposta::erroHttp(404);
+        }
+
+        return ResultadoResposta::arquivo(
+            Storage::disk($arquivo->disk)->path($arquivo->path),
+            [
+                'Content-Disposition' => 'inline; filename="'.basename($arquivo->original_name ?: $arquivo->path).'"',
+            ],
+        );
+    }
+
+    private function resolverProfissional(mixed $usuario): Professional|ResultadoResposta
+    {
+        if (! $usuario instanceof User || ! $usuario->isProfessional()) {
+            return ResultadoResposta::erroHttp(403);
+        }
+
+        $profissional = $this->repositorioProfissional->findFirstForUserId($usuario->id);
+        if ($profissional === null) {
+            return ResultadoResposta::erroHttp(404);
+        }
+
+        return $profissional;
+    }
+
+    private function limiteDeVerificacaoExcedido(
         Professional $profissional,
         string $tipoDocumento,
         int $quantidadeNovos,
-        Request $requisicao,
-    ): ?RedirectResponse {
+    ): ?ResultadoResposta {
         $totalExistente = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_VERIFICATION_DOCUMENT)
             ->count();
@@ -225,58 +346,49 @@ class ProfessionalProfileFilesService
             ->count();
 
         if ($totalExistente + $quantidadeNovos > self::MAX_VERIFICATION_FILES) {
-            return redirect()
-                ->route('professional.files')
-                ->withFragment('doc-'.$tipoDocumento)
-                ->withErrors([
+            return ResultadoResposta::redirecionar(
+                'professional.files',
+                erros: [
                     'documents' => __('labels.professional_files_verification_limit', [
                         'max' => self::MAX_VERIFICATION_FILES,
                     ]),
-                ])
-                ->withInput($requisicao->only('document_type'));
+                ],
+                fragmento: 'doc-'.$tipoDocumento,
+                input: ['document_type' => $tipoDocumento],
+            );
         }
 
         if ($existenteNoTipo + $quantidadeNovos > self::MAX_VERIFICATION_FILES_PER_TYPE) {
-            return redirect()
-                ->route('professional.files')
-                ->withFragment('doc-'.$tipoDocumento)
-                ->withErrors([
+            return ResultadoResposta::redirecionar(
+                'professional.files',
+                erros: [
                     'documents' => __('labels.professional_files_verification_limit_per_type', [
                         'max' => self::MAX_VERIFICATION_FILES_PER_TYPE,
                     ]),
-                ])
-                ->withInput($requisicao->only('document_type'));
+                ],
+                fragmento: 'doc-'.$tipoDocumento,
+                input: ['document_type' => $tipoDocumento],
+            );
         }
 
         return null;
     }
 
-    /**
-     * Regra de limite: fotos públicas (vitrine).
-     *
-     * Passo a passo:
-     * 1. Contar registros com `kind` de foto pública.
-     * 2. Se existentes + novos excederem o máximo, retornar redirect com erro.
-     * 3. Caso contrário, retornar null.
-     *
-     * @return RedirectResponse|null
-     */
-    public function redirecionarSeLimiteDeFotosPublicasExcedido(
-        Professional $profissional,
-        int $quantidadeNovos,
-    ): ?RedirectResponse {
+    private function limiteDeFotosPublicasExcedido(Professional $profissional, int $quantidadeNovos): ?ResultadoResposta
+    {
         $existentes = $profissional->profileFiles()
             ->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
             ->count();
 
         if ($existentes + $quantidadeNovos > self::MAX_PUBLIC_PHOTOS) {
-            return redirect()
-                ->route('professional.files')
-                ->withErrors([
+            return ResultadoResposta::redirecionar(
+                'professional.files',
+                erros: [
                     'photos' => __('labels.professional_files_public_limit', [
                         'max' => self::MAX_PUBLIC_PHOTOS,
                     ]),
-                ]);
+                ],
+            );
         }
 
         return null;

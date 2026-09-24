@@ -19,8 +19,6 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        return view('welcome', [
-            'homepageProfessions' => $this->professionalCategoriesService->obterProfissoesDaPaginaInicial(),
-        ]);
+        return $this->responder($this->professionalCategoriesService->montarPaginaInicial());
     }
 }

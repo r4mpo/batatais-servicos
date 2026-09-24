@@ -17,6 +17,6 @@ class ProfilePhotoController extends Controller
     /** Passo único: entregar arquivo conforme token (regras no service). */
     public function show(string $token): BinaryFileResponse
     {
-        return $this->profilePhotoService->entregarArquivo($token);
+        return $this->responder($this->profilePhotoService->entregarArquivo($token));
     }
 }

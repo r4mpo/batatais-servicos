@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
+use App\Services\Dashboard\DashboardService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): View
-    {
-        $financeSummary = null;
-        $user = auth()->user();
-        if ($user !== null && $user->isProfessional()) {
-            $financeSummary = Service::financeSummaryForProfessionalUser($user->id);
-        }
+    public function __construct(
+        private readonly DashboardService $dashboardService,
+    ) {}
 
-        return view('dashboard', [
-            'financeSummary' => $financeSummary,
-        ]);
+    public function index(Request $requisicao): View
+    {
+        return $this->responder($this->dashboardService->montarPainel($requisicao->user()));
     }
 }

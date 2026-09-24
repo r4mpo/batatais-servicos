@@ -2,10 +2,10 @@
 
 namespace App\Services\Professional;
 
+use App\Http\Responses\ResultadoResposta;
 use App\Repositories\ProfessionRepository;
 use App\Repositories\ProfessionalRepository;
 use Carbon\Carbon;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 /**
@@ -32,22 +32,8 @@ class ProfessionalListingService
      * 5. Converter filtros de nota no piso de média exigido (ou null).
      * 6. Se “nesta semana” estiver ativo, calcular dias da semana de hoje até domingo.
      * 7. Chamar o repositório com preço em centavos e paginar.
-     *
-     * @return array{
-     *     professionals: LengthAwarePaginator,
-     *     filterProfessions: \Illuminate\Database\Eloquent\Collection,
-     *     selectedProfessionIds: list<int>,
-     *     q: string,
-     *     sort: string,
-     *     rating_5: bool,
-     *     rating_4: bool,
-     *     max_price_reais: int,
-     *     avail_today: bool,
-     *     avail_week: bool,
-     *     avail_24h: bool
-     * }
      */
-    public function montarListagem(Request $requisicao): array
+    public function montarListagem(Request $requisicao): ResultadoResposta
     {
         $profissoesParaFiltro = $this->professionRepository->orderedForProfessionalsFilter();
 
@@ -94,7 +80,7 @@ class ProfessionalListingService
             $ordenacao,
         );
 
-        return [
+        return ResultadoResposta::pagina('professionals.index', [
             'professionals' => $profissionais,
             'filterProfessions' => $profissoesParaFiltro,
             'selectedProfessionIds' => $idsProfissoesSelecionados,
@@ -106,7 +92,7 @@ class ProfessionalListingService
             'avail_today' => $disponivelHoje,
             'avail_week' => $disponivelSemana,
             'avail_24h' => $disponivel24h,
-        ];
+        ]);
     }
 
     /**

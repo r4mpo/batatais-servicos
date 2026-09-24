@@ -20,6 +20,6 @@ class ProfessionalController extends Controller
      */
     public function index(Request $requisicao): View
     {
-        return view('professionals.index', $this->listingService->montarListagem($requisicao));
+        return $this->responder($this->listingService->montarListagem($requisicao));
     }
 }

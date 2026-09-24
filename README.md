@@ -2,7 +2,7 @@
 
 > Plataforma web para conectar **clientes (contratantes)** e **profissionais de serviços** em Batatais e região — listagem pública, cadastro, verificação, histórico de serviços e resumo financeiro do profissional.
 
-[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -51,7 +51,7 @@ O projeto prioriza **código legível**, convenções Laravel e separação em c
 
 | Camada | Tecnologia |
 |--------|------------|
-| Backend | **PHP 8.2+**, **Laravel 12** |
+| Backend | **PHP 8.3**, **Laravel 12** |
 | Autenticação | **Laravel Breeze** (sessão, Blade) |
 | Banco | **SQLite** (padrão local) ou **MySQL/MariaDB** |
 | Front (assets) | **Vite 7**, **Tailwind CSS 3**, **Alpine.js** |
@@ -77,7 +77,7 @@ A aplicação segue uma **arquitetura em camadas** inspirada no padrão Laravel,
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│  Controllers (HTTP) — orquestram request/response               │
+│  Controllers (HTTP) — chamam a service e Controller::responder │
 │  Ex.: DashboardController, ProfessionalServiceHistoryController │
 └────────────────────────────┬────────────────────────────────────┘
                              │
@@ -105,10 +105,11 @@ A aplicação segue uma **arquitetura em camadas** inspirada no padrão Laravel,
 
 | Pasta | Papel |
 |-------|--------|
-| `app/Http/Controllers` | Entrada HTTP; delega lógica pesada para Services |
-| `app/Http/Requests` | Validação e normalização (CPF, valores em reais, uploads) |
+| `app/Http/Controllers` | Entrada HTTP do domínio: Form Request, uma chamada à service e `responder()` |
+| `app/Http/Responses` | `ResultadoResposta`: descreve página, redirect, arquivo ou erro HTTP sem montar a resposta |
+| `app/Http/Requests` | Validação e normalização (CPF, valores em reais, uploads, exclusão de conta) |
 | `app/Http/Middleware` | Regras transversais (ex.: profissional sem cadastro → redirect setup) |
-| `app/Services` | Casos de uso: onboarding, arquivos, verificação, listagem |
+| `app/Services` | Regras de negócio: onboarding, arquivos, verificação, listagem, histórico, dashboard e perfil |
 | `app/Repositories` | Queries reutilizáveis (profissionais, profissões, usuários) |
 | `app/Models` | Entidades Eloquent + relacionamentos |
 | `app/Enums` | Estados tipados (ex.: `ServiceStatus`) |
@@ -136,7 +137,7 @@ Valores calculados a partir da tabela `services`:
 - **Líquido disponível**: 90% do disponível (taxa de plataforma de 10%).
 - **Total sacado / Líquido sacado**: mesma lógica para serviços concluídos já sacados.
 
-Implementação em `App\Models\Service::financeSummaryForProfessionalUser()`.
+O cálculo continua em `App\Models\Service::financeSummaryForProfessionalUser()`. O `DashboardService` decide quando exibi-lo e devolve um `ResultadoResposta` de página; o controller só chama `responder()`.
 
 ---
 
@@ -146,7 +147,7 @@ Antes de instalar, garanta:
 
 | Ferramenta | Versão mínima |
 |------------|----------------|
-| PHP | 8.2 (extensões: `mbstring`, `openssl`, `pdo`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`) |
+| PHP | 8.3 (extensões: `mbstring`, `openssl`, `pdo`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`) |
 | Composer | 2.x |
 | Node.js | 18+ (recomendado 20+) |
 | npm | 9+ |
@@ -498,15 +499,7 @@ Campos principais em `services` (além de status e valor):
 - Agendamento: `scheduled_start_date`, `scheduled_end_date`, `scheduled_start_time`, `scheduled_end_time`
 - `contractor_feedback`, `professional_feedback`, `value_withdrawn`
 
-Exemplo de consulta no histórico:
-
-```php
-Service::query()
-    ->with('contractor:id,name,email')
-    ->where('professional_user_id', $user->id)
-    ->orderByDesc('created_at')
-    ->paginate(12);
-```
+A listagem paginada do histórico fica em `ProfessionalServiceHistoryService` (12 itens por página). O controller não consulta o Eloquent.
 
 ---
 
@@ -539,9 +532,10 @@ batatais-servicos/
 ├── app/
 │   ├── Enums/              # ServiceStatus, etc.
 │   ├── Http/
-│   │   ├── Controllers/
+│   │   ├── Controllers/    # domínio fino; Auth do Breeze permanece no fluxo padrão
 │   │   ├── Middleware/
-│   │   └── Requests/
+│   │   ├── Requests/
+│   │   └── Responses/      # ResultadoResposta
 │   ├── Models/
 │   ├── Repositories/
 │   ├── Services/
@@ -600,7 +594,7 @@ Roadmap planejado para evolução da plataforma:
 
 ### 1. 📄 Paginação do histórico de serviços do profissional
 
-Refinar a paginação em `/area-profissional/historico-servicos` (já existe `paginate(12)` no controller): filtros por status, busca por título/contratante, ordenação e UX mobile da navegação entre páginas.
+Refinar a paginação em `/area-profissional/historico-servicos` (já existe `paginate(12)` em `ProfessionalServiceHistoryService`): filtros por status, busca por título/contratante, ordenação e UX mobile da navegação entre páginas.
 
 ### 2. 🖼 Página de perfil / portfólio do profissional
 

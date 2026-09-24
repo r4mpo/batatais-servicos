@@ -24,13 +24,7 @@ class ProfessionalOnboardingController extends Controller
      */
     public function edit(Request $requisicao): RedirectResponse|View
     {
-        $payload = $this->onboardingService->montarModeloDaViewDeCadastro($requisicao->user());
-
-        if ($payload === null) {
-            return redirect()->route('dashboard');
-        }
-
-        return view('professional.setup', $payload);
+        return $this->responder($this->onboardingService->montarModeloDaViewDeCadastro($requisicao->user()));
     }
 
     /**
@@ -38,13 +32,9 @@ class ProfessionalOnboardingController extends Controller
      */
     public function store(ProfessionalOnboardingRequest $requisicao): RedirectResponse
     {
-        $status = $this->onboardingService->persistirAPartirDoValidado(
+        return $this->responder($this->onboardingService->persistirAPartirDoValidado(
             $requisicao->user(),
             $requisicao->validated()
-        );
-
-        return redirect()
-            ->route('dashboard')
-            ->with('status', $status);
+        ));
     }
 }
