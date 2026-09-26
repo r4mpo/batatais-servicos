@@ -28,7 +28,9 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#sobre">
+                    <a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}"
+                       href="{{ route('about') }}"
+                       @if(request()->routeIs('about')) aria-current="page" @endif>
                         {{ __('labels.about') }}
                     </a>
                 </li>

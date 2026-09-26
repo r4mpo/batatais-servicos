@@ -14,6 +14,6 @@ class ProfessionalServiceHistoryController extends Controller
 
     public function index(Request $request): View
     {
-        return $this->responder($this->historyService->montarHistorico($request->user()));
+        return $this->responder($this->historyService->montarHistorico($request->user(), $request));
     }
 }

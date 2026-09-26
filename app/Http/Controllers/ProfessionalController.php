@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Professional;
 use App\Services\Professional\ProfessionalListingService;
+use App\Services\Professional\ProfessionalProfileService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,7 +14,8 @@ use Illuminate\View\View;
 class ProfessionalController extends Controller
 {
     public function __construct(
-        private readonly ProfessionalListingService $listingService
+        private readonly ProfessionalListingService $listingService,
+        private readonly ProfessionalProfileService $profileService,
     ) {}
 
     /**
@@ -21,5 +24,13 @@ class ProfessionalController extends Controller
     public function index(Request $requisicao): View
     {
         return $this->responder($this->listingService->montarListagem($requisicao));
+    }
+
+    /**
+     * Exibe o portfólio público de um profissional.
+     */
+    public function show(Professional $professional): View
+    {
+        return $this->responder($this->profileService->montarPerfil($professional));
     }
 }

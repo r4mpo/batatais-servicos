@@ -43,4 +43,30 @@ enum ServiceStatus: int
             self::Concluded => 'bg-success',
         };
     }
+
+    public function icon(): string
+    {
+        return match ($this) {
+            self::PaymentPending => 'fa-hourglass-half',
+            self::UnderReview => 'fa-search',
+            self::AcceptedByProfessional => 'fa-handshake',
+            self::InProgress => 'fa-person-digging',
+            self::Maintenance => 'fa-screwdriver-wrench',
+            self::Support => 'fa-headset',
+            self::Concluded => 'fa-circle-check',
+        };
+    }
+
+    public function pillClass(): string
+    {
+        return match ($this) {
+            self::PaymentPending => 'service-pay-status service-pay-status--pending',
+            self::UnderReview => 'service-pay-status service-pay-status--review',
+            self::AcceptedByProfessional => 'service-pay-status service-pay-status--accepted',
+            self::InProgress => 'service-pay-status service-pay-status--progress',
+            self::Maintenance => 'service-pay-status service-pay-status--maintenance',
+            self::Support => 'service-pay-status service-pay-status--support',
+            self::Concluded => 'service-pay-status service-pay-status--done',
+        };
+    }
 }

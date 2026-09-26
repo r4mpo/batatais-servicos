@@ -1,0 +1,164 @@
+.about-hero {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 88px 0 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -8%;
+    width: 420px;
+    height: 420px;
+    background: rgba(230, 0, 0, 0.12);
+    border-radius: 50%;
+}
+
+.about-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -35%;
+    left: -6%;
+    width: 320px;
+    height: 320px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
+
+.about-hero .container {
+    position: relative;
+    z-index: 1;
+}
+
+.about-kicker {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 12px;
+}
+
+.about-hero h1 {
+    font-size: 3rem;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.about-hero .lead {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 1.3rem;
+    max-width: 720px;
+}
+
+.about-content {
+    padding: 0 0 80px;
+}
+
+.about-article {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    padding: 3rem 3.25rem;
+    margin-top: -64px;
+    position: relative;
+    z-index: 2;
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.about-article h2 {
+    font-size: 1.75rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    position: relative;
+}
+
+.about-article h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 48px;
+    height: 3px;
+    background: var(--gradient-secondary);
+    border-radius: 2px;
+}
+
+.about-article p {
+    color: #4b5563;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin-bottom: 1.15rem;
+}
+
+.about-article strong {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.about-callout {
+    margin: 1.75rem 0 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-light);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 12px 12px 0;
+}
+
+.about-callout p {
+    margin-bottom: 0;
+}
+
+.about-motto {
+    margin-top: 2.5rem;
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    background: var(--gradient-primary);
+    text-align: center;
+}
+
+.about-motto p {
+    margin: 0;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.45;
+}
+
+.navbar .nav-link.active {
+    color: #fff !important;
+}
+
+.navbar .nav-link.active::after {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 56px 0 96px;
+    }
+
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+
+    .about-hero .lead {
+        font-size: 1.05rem;
+    }
+
+    .about-article {
+        padding: 1.75rem 1.25rem;
+        margin-top: -48px;
+    }
+
+    .about-motto p {
+        font-size: 1.05rem;
+    }
+}

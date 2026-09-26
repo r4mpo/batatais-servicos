@@ -4,9 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Services\User\UserProfilePhotoService;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -20,7 +21,7 @@ class User extends Authenticatable
      */
     public const PROFILE_PHOTO_PUBLIC_DIR = 'img/docs/profile';
 
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -117,6 +118,11 @@ class User extends Authenticatable
     public function isProfessional(): bool
     {
         return $this->profile === self::PROFILE_PROFESSIONAL;
+    }
+
+    public function isContractor(): bool
+    {
+        return $this->profile === self::PROFILE_CONTRACTOR;
     }
 
     /**

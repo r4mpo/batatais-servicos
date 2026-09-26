@@ -76,8 +76,7 @@ return [
     'confirm_password_title' => 'Confirmar Senha',
     'confirm_password_subtitle' => 'Digite sua senha para continuar',
 
-    'confirm_password_description' =>
-        'Para continuar, confirme sua senha. Isso ajuda a proteger sua conta e seus dados.',
+    'confirm_password_description' => 'Para continuar, confirme sua senha. Isso ajuda a proteger sua conta e seus dados.',
 
     'password_label' => 'Senha',
     'password_placeholder' => 'Digite sua senha',
@@ -127,8 +126,7 @@ return [
     */
 
     'welcome_back_title' => 'Bem-vindo de Volta!',
-    'welcome_back_description' =>
-        'Acesse sua conta e continue conectado com oportunidades',
+    'welcome_back_description' => 'Acesse sua conta e continue conectado com oportunidades',
 
     'login_title' => 'Entrar',
     'login_description' => 'Entre em sua conta',
@@ -146,8 +144,7 @@ return [
     */
 
     'join_title' => 'Junte-se a Nós!',
-    'join_subtitle' =>
-        'Crie sua conta e comece a conectar com oportunidades',
+    'join_subtitle' => 'Crie sua conta e comece a conectar com oportunidades',
 
     'create_account_title' => 'Criar Conta',
     'create_account_description' => 'Preencha seus dados abaixo',
@@ -189,7 +186,7 @@ return [
     'already_have_account' => 'Já tem conta?',
     'already_account' => 'Já tem conta?',
 
-/*
+    /*
 |--------------------------------------------------------------------------
 | Modais
 |--------------------------------------------------------------------------
@@ -198,8 +195,8 @@ return [
 |
 */
 
-'terms_modal_title' => 'Termos de Uso - Batatais Serviços',
-'terms_modal_body' => 'Bem-vindo à plataforma ' . config('app.name') . '. Ao criar uma conta, você concorda em utilizar o sistema de forma responsável e respeitosa com todos os usuários da comunidade.
+    'terms_modal_title' => 'Termos de Uso - Batatais Serviços',
+    'terms_modal_body' => 'Bem-vindo à plataforma '.config('app.name').'. Ao criar uma conta, você concorda em utilizar o sistema de forma responsável e respeitosa com todos os usuários da comunidade.
 
 As informações fornecidas durante o cadastro, como **nome, telefone, endereço, valores de serviços, histórico de interações e demais dados**, são armazenadas com segurança em nosso banco de dados.
 
@@ -207,14 +204,14 @@ Esses dados podem ser utilizados dentro da plataforma exclusivamente com o objet
 
 Informações como **endereços, telefones e valores financeiros** podem ser compartilhadas entre usuários apenas quando necessário para a realização de serviços, negociações ou contato entre as partes envolvidas na plataforma.
 
-A plataforma ' . config('app.name') . ' tem como objetivo principal promover a conexão entre profissionais e contratantes da cidade de **Batatais - SP**, incentivando a colaboração, o desenvolvimento local e a facilitação de serviços dentro da comunidade.
+A plataforma '.config('app.name').' tem como objetivo principal promover a conexão entre profissionais e contratantes da cidade de **Batatais - SP**, incentivando a colaboração, o desenvolvimento local e a facilitação de serviços dentro da comunidade.
 
 Todo o fluxo de utilização do sistema foi pensado para proporcionar uma experiência segura, prática e eficiente para os habitantes de Batatais e região.
 
 Ao continuar utilizando a plataforma, você declara estar de acordo com estes termos e com o uso das informações conforme descrito acima.',
 
-'privacy_modal_title' => 'Política de Privacidade - Batatais Serviços',
-'privacy_modal_body' => 'A ' . config('app.name') . ' respeita a privacidade de seus usuários e se compromete a proteger todas as informações fornecidas durante o uso da plataforma.
+    'privacy_modal_title' => 'Política de Privacidade - Batatais Serviços',
+    'privacy_modal_body' => 'A '.config('app.name').' respeita a privacidade de seus usuários e se compromete a proteger todas as informações fornecidas durante o uso da plataforma.
 
 Durante o cadastro e utilização do sistema, algumas informações podem ser coletadas, como **nome, e-mail, telefone, endereço, histórico de interações e dados relacionados a serviços realizados ou solicitados**.
 
@@ -230,7 +227,7 @@ Ao utilizar a plataforma, você concorda com o armazenamento e utilização das 
 
 Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar em contato com os administradores da plataforma.',
 
-'understood' => 'Entendi',    /*
+    'understood' => 'Entendi',    /*
     |--------------------------------------------------------------------------
     | Recuperação de senha
     |--------------------------------------------------------------------------
@@ -238,8 +235,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     'recover_password_title' => 'Recuperar Senha',
 
-    'recover_password_description' =>
-        'Esqueceu sua senha? Informe seu e-mail e enviaremos um link para redefinição.',
+    'recover_password_description' => 'Esqueceu sua senha? Informe seu e-mail e enviaremos um link para redefinição.',
 
     'form_title' => 'Recuperar senha',
     'form_description' => 'Digite seu e-mail para receber o link',
@@ -254,8 +250,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     'reset_password_title' => 'Redefinir senha',
 
-    'reset_password_description' =>
-        'Crie uma nova senha para acessar sua conta com segurança.',
+    'reset_password_description' => 'Crie uma nova senha para acessar sua conta com segurança.',
 
     'new_password_title' => 'Nova senha',
     'new_password_description' => 'Digite sua nova senha abaixo',
@@ -276,17 +271,14 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     'confirm_email_title' => 'Confirme seu Email',
 
-    'confirm_email_description' =>
-        'Para garantir a segurança da sua conta, precisamos confirmar seu endereço de email antes de continuar.',
+    'confirm_email_description' => 'Para garantir a segurança da sua conta, precisamos confirmar seu endereço de email antes de continuar.',
 
     'email_verification_title' => 'Verificação de Email',
     'email_verification_description' => 'Confirme seu endereço para continuar',
 
-    'check_inbox_message' =>
-        'Verifique sua caixa de entrada e clique no link enviado para confirmar seu email.',
+    'check_inbox_message' => 'Verifique sua caixa de entrada e clique no link enviado para confirmar seu email.',
 
-    'verification_link_sent' =>
-        'Um novo link de verificação foi enviado para seu email.',
+    'verification_link_sent' => 'Um novo link de verificação foi enviado para seu email.',
 
     'resend_verification_email' => 'Reenviar Email de Verificação',
 
@@ -302,8 +294,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'hero_title_highlight' => 'de Confiança',
     'hero_title_part2' => 'em Batatais',
 
-    'hero_description' =>
-        'Conectamos você com os melhores profissionais da cidade.',
+    'hero_description' => 'Conectamos você com os melhores profissionais da cidade.',
 
     'hero_contractor' => 'Sou Contratante',
     'hero_professional' => 'Sou Profissional',
@@ -356,6 +347,23 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'professionals_per_hour' => 'hora',
     'professionals_view_profile' => 'Ver perfil',
     'professionals_contact' => 'Contato',
+    'professional_profile_hire' => 'Contratar',
+    'professional_profile_bio' => 'Sobre',
+    'professional_profile_availability' => 'Disponibilidade',
+    'professional_profile_availability_empty' => 'Este profissional ainda não publicou a agenda semanal.',
+    'professional_profile_gallery' => 'Fotos da vitrine',
+    'professional_profile_gallery_empty' => 'Nenhuma foto pública por enquanto.',
+    'professional_profile_reviews' => 'Avaliações',
+    'professional_profile_reviews_empty' => 'Ainda não há avaliações.',
+    'professional_profile_full_day' => 'Dia inteiro',
+    'professional_profile_back' => 'Voltar à busca',
+    'weekday_0' => 'Domingo',
+    'weekday_1' => 'Segunda-feira',
+    'weekday_2' => 'Terça-feira',
+    'weekday_3' => 'Quarta-feira',
+    'weekday_4' => 'Quinta-feira',
+    'weekday_5' => 'Sexta-feira',
+    'weekday_6' => 'Sábado',
     'professionals_pagination_label' => 'Paginação da listagem',
     'professionals_rating_stars_label' => 'Nota :n de 5',
     'nav_professionals' => 'Profissionais',
@@ -422,24 +430,19 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'about_title_brand' => 'Batatais Serviços',
 
     'verified_professionals_title' => 'Profissionais Verificados',
-    'verified_professionals_description' =>
-        'Todos os profissionais são analisados e verificados para sua segurança.',
+    'verified_professionals_description' => 'Todos os profissionais são analisados e verificados para sua segurança.',
 
     'security_title' => 'Segurança Garantida',
-    'security_description' =>
-        'Plataforma segura com dados criptografados e confiável.',
+    'security_description' => 'Plataforma segura com dados criptografados e confiável.',
 
     'communication_title' => 'Fácil Comunicação',
-    'communication_description' =>
-        'Chat integrado para comunicação direta com profissionais.',
+    'communication_description' => 'Chat integrado para comunicação direta com profissionais.',
 
     'history_title' => 'Histórico Completo',
-    'history_description' =>
-        'Acompanhe todos os seus serviços e contratações em um só lugar.',
+    'history_description' => 'Acompanhe todos os seus serviços e contratações em um só lugar.',
 
     'support_title' => 'Suporte Local',
-    'support_description' =>
-        'Atendimento dedicado e responsivo para a comunidade de Batatais.',
+    'support_description' => 'Atendimento dedicado e responsivo para a comunidade de Batatais.',
 
     /*
     |--------------------------------------------------------------------------
@@ -448,8 +451,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     */
 
     'cta_title' => 'Comece Agora Mesmo!',
-    'cta_description' =>
-        'Encontre o profissional perfeito para suas necessidades',
+    'cta_description' => 'Encontre o profissional perfeito para suas necessidades',
 
     'cta_contractor' => 'Sou Contratante',
     'cta_professional' => 'Sou Profissional',
@@ -538,6 +540,71 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
     'service_history_schedule' => 'Período',
     'service_history_hours' => 'Horário',
     'service_history_address' => 'Endereço',
+    'service_history_search_label' => 'Busca',
+    'service_history_search_placeholder' => 'Título ou nome',
+    'service_history_status_label' => 'Status',
+    'service_history_status_all' => 'Todos',
+    'service_history_sort_label' => 'Ordenação',
+    'service_history_sort_recent' => 'Mais recentes',
+    'service_history_sort_oldest' => 'Mais antigos',
+    'service_history_sort_value_desc' => 'Maior valor',
+    'service_history_sort_value_asc' => 'Menor valor',
+    'service_history_filter_submit' => 'Filtrar',
+    'service_history_no_results_title' => 'Nenhum serviço encontrado',
+    'service_history_no_results_text' => 'Ajuste a busca, o status ou a ordenação para ver outros registros.',
+    'pagination_nav' => 'Navegação de páginas',
+    'pagination_page_of' => 'Página :current de :last',
+
+    'contractor_services_title' => 'Meus serviços',
+    'contractor_services_lead' => 'Serviços que você contratou na plataforma.',
+    'contractor_services_professional' => 'Profissional',
+    'contractor_services_new' => 'Novo serviço',
+    'contractor_services_professional_search' => 'Busque por nome ou profissão',
+    'contractor_services_professional_later' => 'Definir depois',
+    'contractor_services_end_before_start' => 'O término não pode ser anterior ao início.',
+    'contractor_services_professional_pending' => 'A definir',
+    'contractor_services_professional_hint' => 'Você pode escolher o profissional agora ou preencher depois, enquanto o pagamento estiver pendente.',
+    'contractor_services_professional_invalid' => 'Escolha um profissional cadastrado ou deixe para definir depois.',
+    'contractor_services_create_title' => 'Contratar serviço',
+    'contractor_services_edit_title' => 'Editar serviço',
+    'contractor_services_field_title' => 'Título',
+    'contractor_services_field_description' => 'Descrição',
+    'contractor_services_field_value' => 'Valor (R$)',
+    'contractor_services_field_start_date' => 'Início',
+    'contractor_services_field_end_date' => 'Término',
+    'contractor_services_field_start_time' => 'Hora inicial',
+    'contractor_services_field_end_time' => 'Hora final',
+    'contractor_services_field_postal_code' => 'CEP',
+    'contractor_services_field_street' => 'Rua',
+    'contractor_services_field_number' => 'Número',
+    'contractor_services_field_complement' => 'Complemento',
+    'contractor_services_field_neighborhood' => 'Bairro',
+    'contractor_services_field_city' => 'Cidade',
+    'contractor_services_field_state' => 'UF',
+    'contractor_services_save' => 'Salvar',
+    'contractor_services_pay' => 'Pagar (simulado)',
+    'contractor_services_pay_hint' => 'O pagamento é simulado: o serviço passa para análise e o profissional ainda não é notificado.',
+    'contractor_services_edit' => 'Editar',
+    'contractor_services_delete' => 'Excluir',
+    'contractor_services_delete_title' => 'Excluir este serviço?',
+    'contractor_services_delete_confirm' => 'Excluir',
+    'contractor_services_delete_cancel' => 'Cancelar',
+    'contractor_services_back' => 'Voltar à lista',
+    'contractor_services_created' => 'Serviço registrado. O pagamento ainda está pendente.',
+    'contractor_services_updated' => 'Serviço atualizado.',
+    'contractor_services_deleted' => 'Serviço excluído.',
+    'contractor_services_paid' => 'Pagamento simulado confirmado. O serviço está em análise.',
+    'contractor_services_empty_title' => 'Nenhum serviço contratado',
+    'contractor_services_empty_text' => 'Use Novo serviço para registrar a primeira contratação.',
+    'dashboard_contractor_stats_title' => 'Resumo dos serviços',
+    'dashboard_contractor_stats_lead' => 'Soma dos valores dos serviços que você contratou, separada por situação.',
+    'dashboard_contractor_stats_total' => 'Total contratado',
+    'dashboard_contractor_stats_pending' => 'Pagamento pendente',
+    'dashboard_contractor_stats_in_progress' => 'Em andamento',
+    'dashboard_contractor_stats_concluded' => 'Concluído',
+    'dashboard_contractor_history_title' => 'Histórico de serviços',
+    'dashboard_contractor_history_text' => 'Serviços que você contratou, com valor, período e status.',
+    'dashboard_contractor_history_btn' => 'Ver histórico',
 
     'dashboard_card_files_title' => 'Arquivos do perfil',
     'dashboard_card_files_text' => 'Foto para o diretório público, documentos para verificação e fotos da sua vitrine.',
@@ -664,8 +731,7 @@ Caso tenha dúvidas sobre como seus dados são utilizados, recomendamos entrar e
 
     'title' => config('app.name'),
 
-    'description' =>
-        'Conectando profissionais e contratantes em Batatais-SP com confiança e qualidade.',
+    'description' => 'Conectando profissionais e contratantes em Batatais-SP com confiança e qualidade.',
 
     'quick_links' => 'Links Rápidos',
 

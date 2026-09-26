@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\ResultadoResposta;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -12,13 +13,14 @@ abstract class Controller
     /**
      * Único ponto que transforma {@see ResultadoResposta} em resposta HTTP.
      */
-    protected function responder(ResultadoResposta $resultado): View|RedirectResponse|BinaryFileResponse
+    protected function responder(ResultadoResposta $resultado): View|RedirectResponse|BinaryFileResponse|JsonResponse
     {
         return match ($resultado->tipo) {
             ResultadoResposta::PAGINA => view((string) $resultado->view, $resultado->dados),
             ResultadoResposta::REDIRECIONAR => $this->montarRedirecionamento($resultado),
             ResultadoResposta::ARQUIVO => response()->file((string) $resultado->caminho, $resultado->headers),
-            ResultadoResposta::ERRO_HTTP => abort($resultado->statusHttp),
+            ResultadoResposta::JSON => response()->json($resultado->dados, $resultado->statusHttp),
+            ResultadoResposta::ERRO_HTTP => abort($resultado->statusHttp, $resultado->mensagem ?? ''),
         };
     }
 

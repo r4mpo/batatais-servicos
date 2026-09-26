@@ -25,15 +25,47 @@
                 </div>
             </header>
 
+            <form method="get" action="{{ route('professional.services.history') }}" class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1" for="history-q">{{ __('labels.service_history_search_label') }}</label>
+                            <input type="search" name="q" id="history-q" value="{{ $filters['q'] }}" class="form-control" placeholder="{{ __('labels.service_history_search_placeholder') }}">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1" for="history-status">{{ __('labels.service_history_status_label') }}</label>
+                            <select name="status" id="history-status" class="form-select">
+                                <option value="">{{ __('labels.service_history_status_all') }}</option>
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status->value }}" @selected($filters['status'] === (string) $status->value)>{{ $status->label() }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small text-muted mb-1" for="history-sort">{{ __('labels.service_history_sort_label') }}</label>
+                            <select name="sort" id="history-sort" class="form-select">
+                                <option value="recent" @selected($filters['sort'] === 'recent')>{{ __('labels.service_history_sort_recent') }}</option>
+                                <option value="oldest" @selected($filters['sort'] === 'oldest')>{{ __('labels.service_history_sort_oldest') }}</option>
+                                <option value="value_desc" @selected($filters['sort'] === 'value_desc')>{{ __('labels.service_history_sort_value_desc') }}</option>
+                                <option value="value_asc" @selected($filters['sort'] === 'value_asc')>{{ __('labels.service_history_sort_value_asc') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-2 d-grid">
+                            <button type="submit" class="btn btn-primary">{{ __('labels.service_history_filter_submit') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
             @if ($services->isEmpty())
                 <div class="card shadow-sm border-0 service-history-empty">
                     <div class="card-body text-center py-5 px-4">
                         <div class="service-history-empty-icon mb-3" aria-hidden="true">
                             <i class="fas fa-clipboard-list"></i>
                         </div>
-                        <h2 class="h5 fw-semibold">{{ __('labels.service_history_empty_title') }}</h2>
+                        <h2 class="h5 fw-semibold">{{ $filtersActive ? __('labels.service_history_no_results_title') : __('labels.service_history_empty_title') }}</h2>
                         <p class="text-muted mb-0 mx-auto" style="max-width: 28rem;">
-                            {{ __('labels.service_history_empty_text') }}
+                            {{ $filtersActive ? __('labels.service_history_no_results_text') : __('labels.service_history_empty_text') }}
                         </p>
                     </div>
                 </div>
@@ -155,8 +187,8 @@
                     @endforeach
                 </div>
 
-                <div class="mt-4 d-flex justify-content-center">
-                    {{ $services->links() }}
+                <div class="mt-4">
+                    {{ $services->links('pagination.history') }}
                 </div>
             @endif
         </div>

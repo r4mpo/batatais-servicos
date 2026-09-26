@@ -1,6 +1,6 @@
 # 🥔 Batatais Serviços
 
-> Plataforma web para conectar **clientes (contratantes)** e **profissionais de serviços** em Batatais e região — listagem pública, cadastro, verificação, histórico de serviços e resumo financeiro do profissional.
+> Plataforma web para conectar **clientes (contratantes)** e **profissionais de serviços** em Batatais e região — diretório e perfil público, cadastro, verificação, histórico e área do contratante para criar, pagar e acompanhar serviços.
 
 [![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
@@ -37,11 +37,14 @@ O **Batatais Serviços** é um marketplace local de prestação de serviços. Ho
 | Área | O que já existe |
 |------|-----------------|
 | 🏠 **Página inicial** | Apresentação, categorias e destaques |
-| 🔍 **Diretório** | Listagem pública em `/profissionais` com filtros |
+| 🔍 **Diretório** | Listagem pública em `/profissionais` com filtros; foto e nome abrem o perfil |
+| 🖼 **Perfil público** | Bio, profissão, valor/hora, disponibilidade, fotos, avaliações e selo em `/profissionais/{id}` |
+| ℹ️ **Sobre nós** | Página institucional em `/sobre-nos` |
 | 👤 **Autenticação** | Registro, login, verificação de e-mail (Laravel Breeze) |
 | 🧑‍🔧 **Profissional** | Onboarding, arquivos (foto, documentos, vitrine), solicitação de selo de verificação |
-| 📊 **Dashboard** | Hub do profissional com resumo financeiro baseado em serviços concluídos |
-| 📜 **Histórico** | Lista estilizada dos serviços do profissional com endereço, período, valores e feedbacks |
+| 📊 **Dashboard** | Profissional: resumo financeiro (bruto e líquido, taxa de 10%). Contratante: faixa com total, pendente, em andamento e concluído, mais atalhos de histórico e mensagens |
+| 📜 **Histórico** | Serviços do profissional com filtro de status, busca, ordenação e paginação |
+| 📝 **Área do cliente** | Cria serviço com profissional opcional, busca ligada ao back-end, valor em `1.234,56` e endereço via ViaCEP. Paga de forma simulada e edita ou exclui só enquanto o pagamento está pendente |
 
 O projeto prioriza **código legível**, convenções Laravel e separação em camadas (Controllers finos, Services, Repositories, Enums).
 
@@ -85,8 +88,8 @@ A aplicação segue uma **arquitetura em camadas** inspirada no padrão Laravel,
         ▼                    ▼                    ▼
 ┌───────────────┐   ┌─────────────────┐   ┌──────────────────┐
 │ Form Requests │   │ Services        │   │ Repositories     │
-│ (validação)   │   │ (regras de      │   │ (consultas       │
-│               │   │  negócio)       │   │  complexas)      │
+│ (validação)   │   │ (regras de      │   │ (consultas e     │
+│               │   │  negócio)       │   │  gravações)      │
 └───────────────┘   └────────┬────────┘   └────────┬─────────┘
                              │                     │
                              └──────────┬──────────┘
@@ -106,12 +109,12 @@ A aplicação segue uma **arquitetura em camadas** inspirada no padrão Laravel,
 | Pasta | Papel |
 |-------|--------|
 | `app/Http/Controllers` | Entrada HTTP do domínio: Form Request, uma chamada à service e `responder()` |
-| `app/Http/Responses` | `ResultadoResposta`: descreve página, redirect, arquivo ou erro HTTP sem montar a resposta |
+| `app/Http/Responses` | `ResultadoResposta`: descreve página, redirect, JSON, arquivo ou erro HTTP sem montar a resposta |
 | `app/Http/Requests` | Validação e normalização (CPF, valores em reais, uploads, exclusão de conta) |
 | `app/Http/Middleware` | Regras transversais (ex.: profissional sem cadastro → redirect setup) |
-| `app/Services` | Regras de negócio: onboarding, arquivos, verificação, listagem, histórico, dashboard e perfil |
-| `app/Repositories` | Queries reutilizáveis (profissionais, profissões, usuários) |
-| `app/Models` | Entidades Eloquent + relacionamentos |
+| `app/Services` | Regras de negócio: onboarding, arquivos, verificação, listagem, histórico, dashboard, perfil e CRUD do contratante. Não consultam o banco |
+| `app/Repositories` | Único lugar das consultas e gravações (serviços, profissionais, profissões, usuários) |
+| `app/Models` | Entidades Eloquent, relacionamentos e casts. Sem query de listagem ou soma |
 | `app/Enums` | Estados tipados (ex.: `ServiceStatus`) |
 | `app/Support` | Utilitários (documentos brasileiros, formatação) |
 | `resources/views` | Blade; CSS em `public/css/` por feature |
@@ -137,7 +140,9 @@ Valores calculados a partir da tabela `services`:
 - **Líquido disponível**: 90% do disponível (taxa de plataforma de 10%).
 - **Total sacado / Líquido sacado**: mesma lógica para serviços concluídos já sacados.
 
-O cálculo continua em `App\Models\Service::financeSummaryForProfessionalUser()`. O `DashboardService` decide quando exibi-lo e devolve um `ResultadoResposta` de página; o controller só chama `responder()`.
+As somas ficam em `ServiceRepository`. A taxa de 10% é regra do `DashboardService`, que devolve um `ResultadoResposta` de página; o controller só chama `responder()`.
+
+O contratante vê, no mesmo painel, a soma dos serviços que cadastrou: total, pagamento pendente, em andamento (status 2 a 6) e concluídos.
 
 ---
 
@@ -323,6 +328,9 @@ As migrations rodam no SQL Server com três cuidados que o MySQL e o SQLite não
 - Não use `restrictOnDelete()`. O T-SQL rejeita `ON DELETE RESTRICT`. Sem essa cláusula, o padrão já é `NO ACTION`, o mesmo efeito de impedir apagar o pai enquanto existir filho.
 - Não crie dois caminhos de `CASCADE` (ou `SET NULL`) entre as mesmas tabelas. Por isso `professional_reviews.user_id` e `services` não cascateiam a partir de `users`: a avaliação é apagada junto com o profissional, e ao excluir a conta o model `User` remove as avaliações que a pessoa escreveu e zera `decided_by_user_id`.
 - `cpf` e `cnpj` podem ficar vazios em vários profissionais. No SQL Server um unique comum aceita um único `NULL`. A migration `2026_09_24_200000_use_filtered_unique_indexes_for_professional_documents_on_sqlsrv` troca esses índices por unique filtrado (`WHERE coluna IS NOT NULL`) só nesse driver.
+- A sessão do SQL Server em português usa `DATEFORMAT dmy` e lê `Y-m-d` como ano-dia-mês. `AppServiceProvider` executa `SET DATEFORMAT ymd` com `unprepared` no evento `ConnectionEstablished` quando o driver é `sqlsrv`. `statement()` não persiste o `SET`.
+- `withExists` gera `EXISTS(...)` na lista do `SELECT`, que o SQL Server rejeita. O selo de verificação usa `withCount` com alias.
+- Chaves estrangeiras numéricas voltam como texto. A comparação de dono do serviço converte os dois lados para inteiro, e o model faz cast de `contractor_user_id` e `professional_user_id`.
 
 A suíte PHPUnit usa SQLite em memória (`phpunit.xml`) e não precisa do SQL Server.
 
@@ -473,10 +481,19 @@ Testes de feature ficam em `tests/Feature/` (onboarding, autenticação, verific
 | Método | URI | Nome | Descrição |
 |--------|-----|------|-----------|
 | GET | `/` | `home` | Página inicial |
+| GET | `/sobre-nos` | `about` | Página institucional |
 | GET | `/profissionais` | `professionals.index` | Diretório público |
-| GET | `/dashboard` | `dashboard` | Painel (auth) |
+| GET | `/profissionais/{professional}` | `professionals.show` | Perfil público do profissional |
+| GET | `/dashboard` | `dashboard` | Painel do profissional ou do contratante (auth) |
 | GET | `/area-profissional/cadastro` | `professional.setup` | Onboarding profissional |
-| GET | `/area-profissional/historico-servicos` | `professional.services.history` | Histórico de serviços |
+| GET | `/area-profissional/historico-servicos` | `professional.services.history` | Histórico de serviços do profissional (filtros, ordenação e paginação) |
+| GET | `/area-cliente/profissionais` | `contractor.professionals.search` | Busca JSON de profissionais (nome ou profissão, mínimo de 2 caracteres) |
+| GET/POST | `/area-cliente/servicos` | `contractor.services.index` / `.store` | Lista paginada e criação de serviços do contratante |
+| GET | `/area-cliente/servicos/novo` | `contractor.services.create` | Formulário de contratação |
+| GET | `/area-cliente/servicos/{service}` | `contractor.services.show` | Detalhe do serviço |
+| GET | `/area-cliente/servicos/{service}/editar` | `contractor.services.edit` | Edição; outro usuário recebe 403 `Access Denied` |
+| PUT/DELETE | `/area-cliente/servicos/{service}` | `contractor.services.update` / `.destroy` | Atualização e exclusão, só com pagamento pendente e só pelo dono |
+| POST | `/area-cliente/servicos/{service}/pagamento` | `contractor.services.pay` | Pagamento simulado (`PaymentPending` → `UnderReview`) |
 | GET | `/area-profissional/arquivos` | `professional.files` | Fotos e documentos |
 | GET | `/area-profissional/verificacao` | `professional.verificacao` | Solicitar selo |
 | GET | `/profile` | `profile.edit` | Perfil da conta |
@@ -496,6 +513,11 @@ const PROFILE_PROFESSIONAL = '001';  // Prestador de serviços
 public function isProfessional(): bool
 {
     return $this->profile === self::PROFILE_PROFESSIONAL;
+}
+
+public function isContractor(): bool
+{
+    return $this->profile === self::PROFILE_CONTRACTOR;
 }
 ```
 
@@ -520,11 +542,12 @@ Enum `App\Enums\ServiceStatus`:
 Campos principais em `services` (além de status e valor):
 
 - `title`, `description`
+- `contractor_user_id` e `professional_user_id` (este pode ficar nulo até o contratante escolher o profissional)
 - Endereço: `address_postal_code`, `address_street`, `address_number`, `address_complement`, `address_neighborhood`, `address_city`, `address_state`
-- Agendamento: `scheduled_start_date`, `scheduled_end_date`, `scheduled_start_time`, `scheduled_end_time`
+- Agendamento: `scheduled_start_date`, `scheduled_end_date`, `scheduled_start_time`, `scheduled_end_time` (o término não pode ser anterior ao início)
 - `contractor_feedback`, `professional_feedback`, `value_withdrawn`
 
-A listagem paginada do histórico fica em `ProfessionalServiceHistoryService` (12 itens por página). O controller não consulta o Eloquent.
+A listagem paginada (12 itens) fica em `ServiceRepository`. `ProfessionalServiceHistoryService` e `ContractorServiceControlService` só normalizam filtros e autorizam. O controller não consulta o Eloquent. A taxa de 10% do profissional é calculada no `DashboardService` a partir das somas do repositório.
 
 ---
 
@@ -573,11 +596,15 @@ batatais-servicos/
 │   ├── pt_BR/
 │   └── en/
 ├── public/
-│   ├── css/                # dashboard.css, service-history.css, ...
+│   ├── css/                # dashboard.css, service-history.css, professionals.css, about.css
+│   ├── js/                 # contractor-service-form.js (moeda, ViaCEP, busca)
 │   └── img/
 ├── resources/
 │   └── views/
+│       ├── about/
+│       ├── contractor/     # services: lista, formulário, detalhe, modal de exclusão
 │       ├── professional/
+│       ├── professionals/
 │       ├── profile/
 │       └── layouts/
 ├── routes/
@@ -604,7 +631,7 @@ O **Cursor** não é “só mais um editor”: é um ambiente onde IA e código 
 
 ### Como tirar o máximo proveito
 
-1. **Descreva o padrão** — “siga as outras tabelas”, “use `labels.php`”, “controller fino + service”.
+1. **Descreva o padrão** — “siga as outras tabelas”, “use `labels.php`”, “controller fino + service + repository”.
 2. **Peça mudanças pequenas e encadeadas** — migration → model → seeder → view → rota.
 3. **Use o Agent com o projeto aberto** — ele executa `artisan migrate`, `db:seed` e testes quando necessário.
 4. **Revise sempre** — IA acelera; você valida regra de negócio, segurança e UX.
@@ -619,11 +646,11 @@ Roadmap planejado para evolução da plataforma:
 
 ### 1. 📄 Paginação do histórico de serviços do profissional
 
-Refinar a paginação em `/area-profissional/historico-servicos` (já existe `paginate(12)` em `ProfessionalServiceHistoryService`): filtros por status, busca por título/contratante, ordenação e UX mobile da navegação entre páginas.
+Concluído. `/area-profissional/historico-servicos` filtra por status, busca título ou contratante, ordena por data ou valor e usa navegação de páginas adaptada ao mobile. A lista do contratante em `/area-cliente/servicos` usa a mesma paginação.
 
 ### 2. 🖼 Página de perfil / portfólio do profissional
 
-Página pública (ou semi-pública) com **todas** as informações condizentes: bio, profissão, valor/hora, disponibilidade, fotos da vitrine, avaliações, selo de verificação e CTA para contratar.
+Concluído. `/profissionais/{professional}` mostra bio, profissão, valor/hora, disponibilidade, fotos da vitrine, avaliações e selo. Na busca, a foto e o nome apontam para essa página. O serviço novo é criado em `/area-cliente/servicos`, e o profissional pode ser escolhido depois.
 
 ### 3. 💬 Sistema de mensagens
 
@@ -631,7 +658,7 @@ Canal de comunicação **cliente ↔ profissional** (threads por serviço ou por
 
 ### 4. 📝 Controle de serviços (fluxo do cliente)
 
-Fluxo em que o **cliente cria** o serviço, define valor e período, **paga** (inicialmente simulado / sem gateway) e o **profissional aceita** ou recusa — integrado ao enum de status existente.
+Concluído no lado do contratante. O serviço nasce em `/area-cliente/servicos/novo`, com profissional opcional (busca no back-end), valor mascarado e endereço preenchido pelo ViaCEP. O pagamento simulado leva `PaymentPending` a `UnderReview`. Editar e excluir (com modal de confirmação) só valem enquanto o pagamento está pendente; outro usuário recebe 403 `Access Denied`. Aceite do profissional existe como `ContractorServiceControlService::aceitarPeloProfissional()` e ainda não tem tela. Recusa continua sem valor no enum.
 
 ### 5. 💳 Pagamentos, saques e estornos
 
@@ -643,17 +670,12 @@ Integração com gateway para:
 
 ### 6. 🏠 Dashboard do cliente (contratante)
 
-Painel enxuto com apenas:
-
-- **histórico de serviços** (como contratante);
-- **histórico de mensagens**.
-
-Sem duplicar cards do fluxo profissional.
+Concluído. O painel do contratante tem a faixa de valores (total, pendente, em andamento e concluído), o atalho para o histórico de serviços e o card de mensagens ilustrado (sem funcionamento).
 
 ### 7. 🌐 Conteúdo institucional e estatísticas reais
 
 - Redes sociais e contatos configuráveis;
-- páginas **Termos de uso**, **Sobre nós**, política de privacidade;
+- páginas **Termos de uso** e política de privacidade (`/sobre-nos` já existe);
 - substituir números estáticos da home por **métricas reais** (profissionais ativos, serviços concluídos, etc.).
 
 ---

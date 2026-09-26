@@ -25,7 +25,7 @@
                 <h5>{{ __('labels.quick_links') }}</h5>
 
                 <ul class="list-unstyled">
-                    <li><a href="#" class="text-white-50">{{ __('labels.about') }}</a></li>
+                    <li><a href="{{ route('about') }}" class="text-white-50">{{ __('labels.about') }}</a></li>
                     <li><a href="#" class="text-white-50">{{ __('labels.terms') }}</a></li>
                     <li><a href="#" class="text-white-50">{{ __('labels.privacy') }}</a></li>
                     <li><a href="#" class="text-white-50">{{ __('labels.contact') }}</a></li>

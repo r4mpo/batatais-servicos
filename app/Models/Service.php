@@ -39,6 +39,8 @@ class Service extends Model
     {
         return [
             'status' => ServiceStatus::class,
+            'contractor_user_id' => 'integer',
+            'professional_user_id' => 'integer',
             'service_value_cents' => 'integer',
             'value_withdrawn' => 'boolean',
             'scheduled_start_date' => 'date',
@@ -130,38 +132,5 @@ class Service extends Model
     public function professionalUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'professional_user_id');
-    }
-
-    /**
-     * @return array{
-     *     available_withdrawal_cents: int,
-     *     net_available_cents: int,
-     *     total_withdrawn_cents: int,
-     *     net_withdrawn_cents: int
-     * }
-     */
-    public static function financeSummaryForProfessionalUser(int $userId): array
-    {
-        $query = static::query()->where('professional_user_id', $userId);
-
-        $availableGross = (clone $query)
-            ->where('status', ServiceStatus::Concluded)
-            ->where('value_withdrawn', false)
-            ->sum('service_value_cents');
-
-        $withdrawnGross = (clone $query)
-            ->where('status', ServiceStatus::Concluded)
-            ->where('value_withdrawn', true)
-            ->sum('service_value_cents');
-
-        $availableGross = (int) $availableGross;
-        $withdrawnGross = (int) $withdrawnGross;
-
-        return [
-            'available_withdrawal_cents' => $availableGross,
-            'net_available_cents' => (int) round($availableGross * 0.9),
-            'total_withdrawn_cents' => $withdrawnGross,
-            'net_withdrawn_cents' => (int) round($withdrawnGross * 0.9),
-        ];
     }
 }

@@ -3,8 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\Professional;
+use App\Models\ProfessionalFile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Repositório de acesso a dados da listagem e do cadastro de profissionais.
@@ -21,7 +23,7 @@ class ProfessionalRepository
      *
      * @param  list<int>  $professionIds  IDs de categorias selecionadas (filtro).
      * @param  list<int>  $weekDayOfWeeks  Dias da semana (0–6) para filtro “disponível nesta semana”.
-     * @return LengthAwarePaginator<int, Professional>  Página de modelos {@see Professional} com query string preservada.
+     * @return LengthAwarePaginator<int, Professional> Página de modelos {@see Professional} com query string preservada.
      */
     public function paginateForListing(
         int $perPage,
@@ -81,7 +83,7 @@ class ProfessionalRepository
         array $weekDayOfWeeks,
     ): void {
         if ($q !== '') {
-            $padraoLike = '%' . $q . '%';
+            $padraoLike = '%'.$q.'%';
             $query->where(function (Builder $consultaExterna) use ($padraoLike) {
                 $consultaExterna->where('professionals.title', 'like', $padraoLike)
                     ->orWhere('professionals.description', 'like', $padraoLike)
@@ -97,7 +99,7 @@ class ProfessionalRepository
 
         if ($minAvgRating !== null) {
             $query->whereRaw(
-                self::AVG_RATING_SUBQUERY . ' >= ?',
+                self::AVG_RATING_SUBQUERY.' >= ?',
                 [$minAvgRating]
             );
         }
@@ -132,8 +134,8 @@ class ProfessionalRepository
 
         switch ($sort) {
             case 'rating':
-                $query->orderByRaw('CASE WHEN ' . $avgSub . ' IS NULL THEN 1 ELSE 0 END')
-                    ->orderByRaw($avgSub . ' DESC');
+                $query->orderByRaw('CASE WHEN '.$avgSub.' IS NULL THEN 1 ELSE 0 END')
+                    ->orderByRaw($avgSub.' DESC');
                 break;
             case 'price_asc':
                 $query->orderBy('hourly_rate_cents', 'asc');
@@ -147,7 +149,7 @@ class ProfessionalRepository
             case 'relevance':
             default:
                 if ($q !== '') {
-                    $padraoLike = '%' . $q . '%';
+                    $padraoLike = '%'.$q.'%';
                     $query->orderByRaw(
                         '(CASE WHEN professionals.title LIKE ? OR professionals.description LIKE ? THEN 0 ELSE 1 END)',
                         [$padraoLike, $padraoLike]
@@ -195,5 +197,81 @@ class ProfessionalRepository
     public function update(Professional $professional, array $attributes): void
     {
         $professional->update($attributes);
+    }
+
+    /**
+     * Carrega bio, profissão, agenda, avaliações, fotos da vitrine e o selo.
+     *
+     * O count do selo usa alias no lugar de withExists: o SQL Server rejeita EXISTS na lista do SELECT.
+     */
+    public function loadPublicProfile(Professional $professional): Professional
+    {
+        $professional->load([
+            'user',
+            'profession',
+            'availabilities' => function ($query) {
+                $query->orderBy('day_of_week')->orderBy('starts_at');
+            },
+            'reviews' => function ($query) {
+                $query->with('user:id,name')->latest();
+            },
+            'profileFiles' => function ($query) {
+                $query->where('kind', ProfessionalFile::KIND_PUBLIC_PHOTO)
+                    ->where(function ($photos) {
+                        $photos->whereNull('file_type')
+                            ->orWhere('file_type', ProfessionalFile::FILE_TYPE_CODE_SHOWCASE);
+                    })
+                    ->orderBy('sort_order');
+            },
+        ]);
+
+        $professional->loadCount([
+            'reviews',
+            'solicitacoesVerificacaoAprovadas as solicitacoes_verificacao_aprovadas_exists',
+        ]);
+        $professional->loadAvg('reviews', 'rating');
+
+        return $professional;
+    }
+
+    /**
+     * @return Collection<int, Professional>
+     */
+    public function searchByNameOrProfession(string $termo, int $limit = 8): Collection
+    {
+        $like = '%'.$termo.'%';
+
+        return Professional::query()
+            ->with(['user:id,name', 'profession:id,title'])
+            ->where(function (Builder $query) use ($like) {
+                $query->whereHas('user', function (Builder $user) use ($like) {
+                    $user->where('name', 'like', $like);
+                })->orWhereHas('profession', function (Builder $profession) use ($like) {
+                    $profession->where('title', 'like', $like);
+                });
+            })
+            ->limit($limit)
+            ->get();
+    }
+
+    public function findIdByUserId(int $userId): ?int
+    {
+        $id = Professional::query()->where('user_id', $userId)->value('id');
+
+        return $id !== null ? (int) $id : null;
+    }
+
+    public function findWithUser(int $id): ?Professional
+    {
+        $professional = Professional::query()->with('user')->find($id);
+
+        return $professional instanceof Professional ? $professional : null;
+    }
+
+    public function findWithUserAndProfession(int $id): ?Professional
+    {
+        $professional = Professional::query()->with(['user', 'profession'])->find($id);
+
+        return $professional instanceof Professional ? $professional : null;
     }
 }

@@ -9,6 +9,9 @@
 
 @section('content')
     <div class="container py-5">
+        @if ($errors->has('professional'))
+            <div class="alert alert-warning">{{ $errors->first('professional') }}</div>
+        @endif
         <div class="row">
             <div class="col-md-3">
                 <form class="filter-sidebar" method="get" action="{{ route('professionals.index') }}" id="professionals-filters-form">
@@ -144,16 +147,16 @@
                             @endphp
                             <div class="col-md-6 col-lg-4">
                                 <div class="card professional-card h-100">
-                                    <div class="professional-image" aria-hidden="true">
+                                    <a href="{{ route('professionals.show', $professional) }}" class="professional-image" aria-label="{{ __('labels.professionals_view_profile') }}: {{ $professional->user->name }}">
                                         @if ($professional->user->profilePhotoUrl())
                                             <img src="{{ $professional->user->profilePhotoUrl() }}" alt="" loading="lazy">
                                         @else
                                             {{ $iniciais !== '' ? $iniciais : '?' }}
                                         @endif
-                                    </div>
+                                    </a>
                                     <div class="professional-body">
                                         <div class="professional-name d-flex align-items-center flex-wrap gap-1">
-                                            <span>{{ $professional->user->name }}</span>
+                                            <a href="{{ route('professionals.show', $professional) }}" class="text-decoration-none text-reset">{{ $professional->user->name }}</a>
                                             @if (! empty($professional->solicitacoes_verificacao_aprovadas_exists))
                                                 <i class="fas fa-check-circle text-primary" title="{{ __('labels.verificacao_selo_aria') }}" aria-label="{{ __('labels.verificacao_selo_aria') }}"></i>
                                             @endif
@@ -180,9 +183,9 @@
                                             {{ \Illuminate\Support\Str::limit($professional->description, 160) }}
                                         </div>
                                         <div class="professional-actions">
-                                            <button type="button" class="btn btn-primary btn-sm" disabled>
+                                            <a href="{{ route('professionals.show', $professional) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye me-1"></i>{{ __('labels.professionals_view_profile') }}
-                                            </button>
+                                            </a>
                                             <button type="button" class="btn btn-secondary btn-sm" disabled>
                                                 <i class="fas fa-message me-1"></i>{{ __('labels.professionals_contact') }}
                                             </button>

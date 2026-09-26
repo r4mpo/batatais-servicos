@@ -27,6 +27,11 @@
     overflow: hidden;
 }
 
+a.professional-image {
+    color: #fff;
+    text-decoration: none;
+}
+
 .professional-image img {
     width: 100%;
     height: 100%;
@@ -151,6 +156,32 @@
     font-size: 3rem;
     margin-bottom: 20px;
     opacity: 0.5;
+}
+
+.profile-hero {
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a4f 100%);
+    color: #fff;
+}
+
+.profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.profile-gallery img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 0.75rem;
 }
 
 @media (max-width: 768px) {

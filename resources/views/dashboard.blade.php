@@ -167,11 +167,69 @@
                     </div>
                 </div>
             @else
-                <div class="card shadow-sm dashboard-card">
+                <div class="card shadow-sm dashboard-finance-card bg-success bg-opacity-10 mb-4">
                     <div class="card-body">
-                        <h2 class="h5 fw-bold">
-                            {{ __('labels.dashboard_contractor_title') }}
+                        <h2 class="h5 fw-bold mb-2 text-success">
+                            <i class="fas fa-wallet me-2" aria-hidden="true"></i>{{ __('labels.dashboard_contractor_stats_title') }}
                         </h2>
+                        <p class="small text-muted mb-3">{{ __('labels.dashboard_contractor_stats_lead') }}</p>
+                        <div class="row g-3 text-center text-md-start">
+                            <div class="col-6 col-md-3">
+                                <span class="text-muted small d-block">{{ __('labels.dashboard_contractor_stats_total') }}</span>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($contractorSummary['total_cents'] ?? 0) }}</strong>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <span class="text-muted small d-block">{{ __('labels.dashboard_contractor_stats_pending') }}</span>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($contractorSummary['pending_cents'] ?? 0) }}</strong>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <span class="text-muted small d-block">{{ __('labels.dashboard_contractor_stats_in_progress') }}</span>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($contractorSummary['in_progress_cents'] ?? 0) }}</strong>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <span class="text-muted small d-block">{{ __('labels.dashboard_contractor_stats_concluded') }}</span>
+                                <strong class="fs-5 d-block">R$
+                                    {{ BrazilianDocuments::formatHourlyReaisFromCents($contractorSummary['concluded_cents'] ?? 0) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm dashboard-card">
+                            <div class="card-body">
+                                <h2 class="h5 fw-bold">
+                                    <i class="fas fa-chart-line me-2 text-dark" aria-hidden="true"></i>
+                                    {{ __('labels.dashboard_contractor_history_title') }}
+                                </h2>
+                                <p class="text-muted small mb-0">{{ __('labels.dashboard_contractor_history_text') }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top pt-3">
+                                <a href="{{ route('contractor.services.index') }}" class="btn btn-outline-dark dashboard-action-btn w-100">
+                                    {{ __('labels.dashboard_contractor_history_btn') }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm dashboard-card">
+                            <div class="card-body">
+                                <h2 class="h5 fw-bold">
+                                    <i class="fas fa-comments me-2 text-secondary" aria-hidden="true"></i>
+                                    {{ __('labels.dashboard_card_messages_title') }}
+                                </h2>
+                                <p class="text-muted small mb-0">{{ __('labels.dashboard_card_messages_text') }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top pt-3">
+                                <button type="button" class="btn btn-outline-secondary dashboard-action-btn w-100">
+                                    {{ __('labels.dashboard_card_messages_btn') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif

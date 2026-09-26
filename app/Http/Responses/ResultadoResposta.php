@@ -15,6 +15,8 @@ final class ResultadoResposta
 
     public const ERRO_HTTP = 'erro_http';
 
+    public const JSON = 'json';
+
     /**
      * @param  array<string, mixed>  $dados
      * @param  array<string, mixed>  $parametros
@@ -37,6 +39,7 @@ final class ResultadoResposta
         public readonly ?string $caminho = null,
         public readonly array $headers = [],
         public readonly int $statusHttp = 500,
+        public readonly ?string $mensagem = null,
     ) {}
 
     /**
@@ -82,8 +85,16 @@ final class ResultadoResposta
         return new self(tipo: self::ARQUIVO, caminho: $caminho, headers: $headers);
     }
 
-    public static function erroHttp(int $status): self
+    public static function erroHttp(int $status, ?string $mensagem = null): self
     {
-        return new self(tipo: self::ERRO_HTTP, statusHttp: $status);
+        return new self(tipo: self::ERRO_HTTP, statusHttp: $status, mensagem: $mensagem);
+    }
+
+    /**
+     * @param  array<string, mixed>|list<mixed>  $dados
+     */
+    public static function json(array $dados, int $statusHttp = 200): self
+    {
+        return new self(tipo: self::JSON, dados: $dados, statusHttp: $statusHttp);
     }
 }
